@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Card details</title>
+    <style>
+      .button {
+      background-color: #FF4500;
+      border: none;
+      color: white;
+      padding: 20px 34px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 20px;
+      margin: 4px 2px;
+      cursor: pointer;
+      }
+    </style>
+</head>
+<body>
+<a href="/chars">All Characters</a><br>
+<h3 th:text="'Name: ' + ${character.name}"/>
+<p th:text="'Description: ' + ${character.description}"/>
+<a th:href="'/chars/' + ${character.id} + '/edit'" class="button">Edit</a>
+<form th:action="'/chars/' + ${character.id} + '/delete'" method="post">
+    <button type="submit">Delete</button>
+</form>
+</body>
+</html>
