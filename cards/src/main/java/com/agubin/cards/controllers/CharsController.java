@@ -1,17 +1,6 @@
 package com.agubin.cards.controllers;
 
-import com.agubin.cards.models.Char;
-import com.agubin.cards.models.CharacterComics;
-import com.agubin.cards.repo.CharacterComicsRepository;
-import com.agubin.cards.repo.CharacterRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.*;
 
 @Controller
 public class CharsController {

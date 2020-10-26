@@ -1,13 +1,13 @@
 package com.agubin.cards.models;
 
-import org.apache.logging.log4j.util.PropertySource;
+import com.agubin.cards.utils.Orderly;
 
 import javax.persistence.*;
 import java.util.Comparator;
 
 @Entity
 @Table(name = "chars")
-public class Char {
+public class Character implements Orderly {
 
     @Id
     private Long id;
@@ -39,23 +39,16 @@ public class Char {
         this.description = description;
     }
 
-    public Char() {
+    public Character() {
     }
 
-    public Char(Long id, String name, String description) {
+    public Character(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
 
-//    public Char(Char character) {
-//        System.out.println("Special constructor worked");
-//        this.id = character.getId();
-//        this.name = character.getName();
-//        this.description = character.getDescription();
-//    }
-
-    public static Comparator<Char> getComparatorFor(String condition) {
+    public static Comparator<Character> getComparator(String condition) {
         switch (condition) {
             case "name":
                 return (o1, o2) -> o1.getName().compareTo(o2.getName());
@@ -68,5 +61,20 @@ public class Char {
             default:
                 return (o1, o2) -> 0;
         }
+    }
+
+    @Override
+    public Comparator<com.agubin.cards.models.Character> getComparatorFor(String condition) {
+        return getComparator(condition);
+    }
+
+    @Override
+    public String nameLikeValue() {
+        return getName();
+    }
+
+    @Override
+    public Long idLikeValue() {
+        return getId();
     }
 }

@@ -1,13 +1,13 @@
 package com.agubin.cards.services;
 
-import com.agubin.cards.models.Char;
+import com.agubin.cards.models.Character;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.repo.CharacterComicsRepository;
 import com.agubin.cards.repo.CharacterRepository;
+import com.agubin.cards.utils.SortFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,31 +31,33 @@ public class CharacterServiceImpl implements CharacterService {
 
 
     @Override
-    public List<Char> getCharacters() {
-        List<Char> characters = new ArrayList<>();
+    public List<Character> getCharacters(Map<String, String> allQueryParams) {
+        List<Character> characters = new ArrayList<>();
         characterRepository.findAll().forEach(characters::add);
+        characters = (List<Character>) SortFilter.sortAndFilter(characters, allQueryParams);
+
         return characters;
     }
 
     @Override
-    public Optional<Char> getCharacterById(Long characterId) {
+    public Optional<Character> getCharacterById(Long characterId) {
         return characterRepository.findById(characterId);
     }
 
-    private boolean saveAndCheckCharacterEntity(Char character) {
-        Char result = characterRepository.save(character);
+    private boolean saveAndCheckCharacterEntity(Character character) {
+        Character result = characterRepository.save(character);
         return result.getId().equals(character.getId())
                 && result.getName().equals(character.getName())
                 && result.getDescription().equals(character.getDescription());
     }
 
     @Override
-    public boolean createCharacter(Char character) {
+    public boolean createCharacter(Character character) {
         return saveAndCheckCharacterEntity(character);
     }
 
     @Override
-    public boolean updateCharacter(Char character) {
+    public boolean updateCharacter(Character character) {
         return saveAndCheckCharacterEntity(character);
     }
 
@@ -65,12 +68,13 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     @Override
-    public List<Char> getComicsCharacters(Long comicId) {
-        List<Char> comicsCharacters= new ArrayList<>();
-        for (CharacterComics characterComics : characterComicsRepository.findByComicsId(comicId)) {
-            Optional<Char> character = characterRepository.findById(characterComics.getCharId());
+    public List<Character> getComicsCharacters(Long comicId, Map<String, String> allQueryParams) {
+        List<Character> comicsCharacters = new ArrayList<>();
+        for (CharacterComics cc : characterComicsRepository.findByComicsId(comicId)) {
+            Optional<Character> character = characterRepository.findById(cc.getCharId());
             character.ifPresent(comicsCharacters::add);
         }
+        comicsCharacters = (List<Character>) SortFilter.sortAndFilter(comicsCharacters, allQueryParams);
         return comicsCharacters;
     }
 

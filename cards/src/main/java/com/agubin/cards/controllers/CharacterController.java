@@ -1,6 +1,6 @@
 package com.agubin.cards.controllers;
 
-import com.agubin.cards.models.Char;
+import com.agubin.cards.models.Character;
 import com.agubin.cards.services.CharacterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -21,15 +22,15 @@ public class CharacterController {
     private CharacterService characterService;
 
     @GetMapping("/characters")
-    public ResponseEntity<List<Char>> getCharacters() {
-        List<Char> characters =characterService.getCharacters();
+    public ResponseEntity<List<Character>> getCharacters(@RequestParam Map<String, String> allQueryParams) {
+        List<Character> characters =characterService.getCharacters(allQueryParams);
         return !characters.isEmpty()
                 ? new ResponseEntity<>(characters, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/characters")
-    public ResponseEntity<?> postCharacter(@RequestBody Char character) {
+    public ResponseEntity<?> postCharacter(@RequestBody Character character) {
         boolean isCharacterCreated = characterService.createCharacter(character);
         return isCharacterCreated
                 ? new ResponseEntity<>(HttpStatus.CREATED)
@@ -37,7 +38,7 @@ public class CharacterController {
     }
 
     @PutMapping("/characters")
-    public ResponseEntity<?> updateCharacter(@RequestBody Char character) {
+    public ResponseEntity<?> updateCharacter(@RequestBody Character character) {
         boolean isCharacterUpdated = characterService.updateCharacter(character);
         return isCharacterUpdated
                 ? new ResponseEntity<>(HttpStatus.CREATED)
@@ -45,8 +46,8 @@ public class CharacterController {
     }
 
     @GetMapping("/characters/{characterid}")
-    public ResponseEntity<?> getCharacter(@PathVariable(value = "characterid") Long characterId) {
-        Optional<Char> character = characterService.getCharacterById(characterId);
+    public ResponseEntity<Character> getCharacter(@PathVariable(value = "characterid") Long characterId) {
+        Optional<Character> character = characterService.getCharacterById(characterId);
         return character.isPresent()
                 ? new ResponseEntity<>(character.get(), HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
@@ -61,8 +62,9 @@ public class CharacterController {
     }
 
     @GetMapping("/comics/{comicid}/character")
-    public ResponseEntity<List<Char>> getComicsCharacters(@PathVariable(value = "comicid") Long comicId) {
-        List<Char> characters =characterService.getComicsCharacters(comicId);
+    public ResponseEntity<List<Character>> getComicsCharacters(@RequestParam Map<String, String> allQueryParams,
+                                                               @PathVariable(value = "comicid") Long comicId) {
+        List<Character> characters =characterService.getComicsCharacters(comicId, allQueryParams);
         return !characters.isEmpty()
                 ? new ResponseEntity<>(characters, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);

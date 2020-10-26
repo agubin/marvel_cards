@@ -1,6 +1,8 @@
 package com.agubin.cards.models;
 
 
+import com.agubin.cards.utils.Orderly;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -8,7 +10,7 @@ import java.util.Comparator;
 
 @Entity
 @Table (name = "comics")
-public class Comics {
+public class Comics implements Orderly {
 
     @Id
     private Long id;
@@ -59,7 +61,22 @@ public class Comics {
         this.creators = creators;
     }
 
-    public static Comparator<Comics> getComparatorFor(String condition) {
+    @Override
+    public Comparator<com.agubin.cards.models.Comics> getComparatorFor(String condition) {
+        return getComparator(condition);
+    }
+
+    @Override
+    public String nameLikeValue() {
+        return getTitle();
+    }
+
+    @Override
+    public Long idLikeValue() {
+        return getId();
+    }
+
+    public static Comparator<Comics> getComparator(String condition) {
         switch (condition) {
             case "title":
                 return (o1, o2) -> o1.getTitle().compareTo(o2.getTitle());
