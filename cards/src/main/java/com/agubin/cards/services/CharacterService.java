@@ -1,5 +1,7 @@
 package com.agubin.cards.services;
 
+import com.agubin.cards.exceptions.InvalidEntityException;
+import com.agubin.cards.exceptions.NonExistingCharacterException;
 import com.agubin.cards.models.Character;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,9 +13,9 @@ public interface CharacterService {
 
     List<Character> getCharacters(Map<String, String> allQueryParams);
 
-    boolean createCharacter(Character character);
+    Optional<Character> createCharacter(Character character) throws InvalidEntityException;
 
-    boolean updateCharacter(Character character);
+    Optional<Character> updateCharacter(Character character);
 
     boolean deleteCharacter(Long characterId);
 
@@ -26,4 +28,8 @@ public interface CharacterService {
     boolean updateFile(MultipartFile file, Long characterId);
 
     Optional<Character> getCharacterById(Long characterId);
+
+    void bindCharactersToComic(Long comicId, List<Long> charactersId) throws NonExistingCharacterException;
+
+    void unbindCharactersFromComic(Long comicId, List<Long> charactersId) throws NonExistingCharacterException;
 }

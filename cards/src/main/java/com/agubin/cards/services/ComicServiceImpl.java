@@ -69,4 +69,37 @@ public class ComicServiceImpl implements ComicService {
         characterComics = (List<Comics>) SortFilter.sortAndFilter(characterComics, allQueryParams);
         return characterComics;
     }
+
+
+    private boolean checkComicsIdList(List<Long> comicsId) {
+        for (Long comicId: comicsId) {
+            if (!comicsRepository.findById(comicId).isPresent()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean bindComicsToCharacter(Long characterId, List<Long> comicsId) {
+        if (checkComicsIdList(comicsId)) {
+            for (Long comicId : comicsId) {
+                characterComicsRepository.save(new CharacterComics(characterId, comicId));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean unbindComicsFromCharacter(Long characterId, List<Long> comicsId) {
+        if (checkComicsIdList(comicsId)) {
+            for (Long comicId : comicsId) {
+                Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
+                characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
+            }
+            return true;
+        }
+        return false;
+    }
 }

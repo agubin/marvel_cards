@@ -19,4 +19,8 @@ public interface ComicService {
     boolean deleteComic(Long comicId);
 
     List<Comics> getCharacterComics(Long characterId, Map<String, String> allQueryParams);
+
+    boolean bindComicsToCharacter(Long characterId, List<Long> comicsId);
+
+    boolean unbindComicsFromCharacter(Long characterId, List<Long> comicsId);
 }

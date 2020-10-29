@@ -3,9 +3,7 @@ package com.agubin.cards.models;
 
 import com.agubin.cards.utils.Orderly;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Comparator;
 
 @Entity
@@ -13,6 +11,8 @@ import java.util.Comparator;
 public class Comics implements Orderly {
 
     @Id
+    @SequenceGenerator(name = "comics_seq", sequenceName = "comics_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "comics_seq")
     private Long id;
 
     private String title;

@@ -1,5 +1,7 @@
 package com.agubin.cards.services;
 
+import com.agubin.cards.exceptions.InvalidEntityException;
+import com.agubin.cards.exceptions.NonExistingCharacterException;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.repo.CharacterComicsRepository;
@@ -7,7 +9,6 @@ import com.agubin.cards.repo.CharacterRepository;
 import com.agubin.cards.utils.SortFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -44,35 +45,62 @@ public class CharacterServiceImpl implements CharacterService {
         return characterRepository.findById(characterId);
     }
 
-    private boolean saveAndCheckCharacterEntity(Character character) {
+    private Optional<Character> saveAndCheckCharacterEntity(Character character) {
         Character result = characterRepository.save(character);
         return result.getId().equals(character.getId())
                 && result.getName().equals(character.getName())
-                && result.getDescription().equals(character.getDescription());
+                && result.getDescription().equals(character.getDescription())
+                ? Optional.of(result)
+                : Optional.empty();
+    }
+
+    private void checkCharacterEntity(Character character) throws InvalidEntityException {
+        StringBuffer errorMessage = new StringBuffer();
+        if (character.getName() == null) {
+            errorMessage.append("Name filed is required!");
+        }
+        if (character.getDescription() == null) {
+            errorMessage.append("Description field is required!");
+        }
+        throw new InvalidEntityException(errorMessage.toString());
     }
 
     @Override
-    public boolean createCharacter(Character character) {
+    public Optional<Character> createCharacter(Character character) throws InvalidEntityException {
+        checkCharacterEntity(character);
         return saveAndCheckCharacterEntity(character);
     }
 
     @Override
-    public boolean updateCharacter(Character character) {
-        return saveAndCheckCharacterEntity(character);
+    public Optional<Character> updateCharacter(Character character) {
+        Optional<Character> characterStub = characterRepository.findById(character.getId());
+        if (characterStub.isPresent()) {
+            Character updatedCharacter = characterStub.get();
+            if (character.getName() != null) {
+                updatedCharacter.setName(character.getName());
+            }
+            if (character.getDescription() != null) {
+                updatedCharacter.setDescription(character.getDescription());
+            }
+            return saveAndCheckCharacterEntity(character);
+        }
+        return Optional.empty();
     }
 
     @Override
     public boolean deleteCharacter(Long characterId) {
-        characterRepository.deleteById(characterId);
-        return !characterRepository.findById(characterId).isPresent();
+        if (characterRepository.existsById(characterId)) {
+            characterRepository.deleteById(characterId);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public List<Character> getComicsCharacters(Long comicId, Map<String, String> allQueryParams) {
         List<Character> comicsCharacters = new ArrayList<>();
         for (CharacterComics cc : characterComicsRepository.findByComicsId(comicId)) {
-            Optional<Character> character = characterRepository.findById(cc.getCharId());
-            character.ifPresent(comicsCharacters::add);
+            comicsCharacters.add(characterRepository.findById(cc.getCharId()).get());
         }
         comicsCharacters = (List<Character>) SortFilter.sortAndFilter(comicsCharacters, allQueryParams);
         return comicsCharacters;
@@ -107,5 +135,36 @@ public class CharacterServiceImpl implements CharacterService {
         } catch (IOException ignored) {
         }
         return Optional.empty();
+    }
+
+    private void checkCharactersIdList(List<Long> charactersId) throws NonExistingCharacterException {
+        ArrayList<Long> nonExistingCharactersId = new ArrayList<>();
+        for (Long characterId: charactersId) {
+            if (!characterRepository.existsById(characterId)) {
+                nonExistingCharactersId.add(characterId);
+            }
+        }
+        if (!nonExistingCharactersId.isEmpty()) {
+            throw new NonExistingCharacterException(nonExistingCharactersId);
+        }
+    }
+
+    @Override
+    public void bindCharactersToComic(Long comicId, List<Long> charactersId) throws NonExistingCharacterException {
+        checkCharactersIdList(charactersId);
+        for (Long characterId : charactersId) {
+            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
+                characterComicsRepository.save(new CharacterComics(characterId, comicId));
+            }
+        }
+    }
+
+    @Override
+    public void unbindCharactersFromComic(Long comicId, List<Long> charactersId) throws NonExistingCharacterException {
+        checkCharactersIdList(charactersId);
+        for (Long characterId : charactersId) {
+            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
+            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
+        }
     }
 }

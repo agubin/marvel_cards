@@ -1,8 +1,11 @@
 package com.agubin.cards.models;
 
+import com.agubin.cards.utils.LinkManager;
 import com.agubin.cards.utils.Orderly;
 
 import javax.persistence.*;
+import java.io.File;
+import java.net.URI;
 import java.util.Comparator;
 
 @Entity
@@ -10,10 +13,14 @@ import java.util.Comparator;
 public class Character implements Orderly {
 
     @Id
+    @SequenceGenerator(name = "chars_seq", sequenceName = "chars_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chars_seq")
     private Long id;
 
     private String name;
     private String description;
+    @Transient
+    private String portraitLink;
 
     public Long getId() {
         return id;
@@ -37,6 +44,12 @@ public class Character implements Orderly {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public URI getPortraitLink() {
+        return new File("character#" + id).exists()
+                ? LinkManager.getCharacterPortraitURI(id)
+                : null;
     }
 
     public Character() {
@@ -64,7 +77,7 @@ public class Character implements Orderly {
     }
 
     @Override
-    public Comparator<com.agubin.cards.models.Character> getComparatorFor(String condition) {
+    public Comparator<Character> getComparatorFor(String condition) {
         return getComparator(condition);
     }
 
