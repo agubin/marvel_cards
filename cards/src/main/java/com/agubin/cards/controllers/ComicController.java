@@ -27,14 +27,6 @@ public class ComicController {
     @Autowired
     private CharacterService characterService;
 
-//    @GetMapping("/comics")
-//    public ResponseEntity<List<Comics>> getComics(@RequestParam Map<String, String> allQueryParams) {
-//        List<Comics> comics = comicService.getComics(allQueryParams);
-//        return !comics.isEmpty()
-//                ? new ResponseEntity<>(comics, HttpStatus.OK)
-//                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
-
     @GetMapping("/comics")
     public ResponseEntity<ComicsCollectionResRepr> getComics(@RequestParam Map<String, String> allQueryParams) {
         List<Comics> comics = comicService.getComics(allQueryParams);
@@ -59,14 +51,6 @@ public class ComicController {
                 : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
     }
 
-//    @GetMapping("/comics/{comicid}")
-//    public ResponseEntity<Comics> getComic(@PathVariable(value = "comicid") Long comicId) {
-//        Optional<Comics> comic = comicService.getComicById(comicId);
-//        return comic.isPresent()
-//                ? new ResponseEntity<>(comic.get(), HttpStatus.OK)
-//                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
-
     @GetMapping("/comics/{comicid}")
     public ResponseEntity<PersonalComicResRepr> getComic(@PathVariable(value = "comicid") Long comicId) {
         Optional<Comics> comic = comicService.getComicById(comicId);
@@ -86,66 +70,27 @@ public class ComicController {
     }
 
 //    @GetMapping("/characters/{characterid}/comics")
-//    public ResponseEntity<List<Comics>> getCharacterComic(@RequestParam Map<String, String> allQueryParams,
+//    public ResponseEntity<ComicsCollectionResRepr> getCharacterComic(@RequestParam Map<String, String> allQueryParams,
 //                                                          @PathVariable(value = "characterid") Long characterId) {
 //        List<Comics> comics = comicService.getCharacterComics(characterId, allQueryParams);
 //        return !comics.isEmpty()
-//                ? new ResponseEntity<>(comics, HttpStatus.OK)
+//                ? new ResponseEntity<>(new ComicsCollectionResRepr(comics, characterId), HttpStatus.OK)
 //                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //    }
-
-    @GetMapping("/characters/{characterid}/comics")
-    public ResponseEntity<ComicsCollectionResRepr> getCharacterComic(@RequestParam Map<String, String> allQueryParams,
-                                                          @PathVariable(value = "characterid") Long characterId) {
-        List<Comics> comics = comicService.getCharacterComics(characterId, allQueryParams);
-        return !comics.isEmpty()
-                ? new ResponseEntity<>(new ComicsCollectionResRepr(comics, characterId), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    @PutMapping("characters/{characterid}/comics")
-    public ResponseEntity<?> bindComics(@PathVariable(value = "characterid") Long characterId, @RequestBody List<Long> comicsId) {
-        boolean areComicsBounded = comicService.bindComicsToCharacter(characterId, comicsId);
-        return areComicsBounded
-                ? new ResponseEntity<>(HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-    }
-
-    @DeleteMapping("characters/{characterid}/comics/{comicsid}")
-    public ResponseEntity<?> unbindComics(@PathVariable(value = "characterid") Long characterId, @PathVariable(value = "comicsid") List<Long> comicsId) {
-        boolean areComicsUnbounded = comicService.unbindComicsFromCharacter(characterId, comicsId);
-        return areComicsUnbounded
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-    }
-
-//    @GetMapping("/comicsss")
-//    public String comics (Model model) {
-//        Iterable<Comics> comics = comicsRepository.findAll();
-//        model.addAttribute("comics", comics);
-//        return "comics_page";
+//
+//    @PutMapping("characters/{characterid}/comics")
+//    public ResponseEntity<?> bindComics(@PathVariable(value = "characterid") Long characterId, @RequestBody List<Long> comicsId) {
+//        boolean areComicsBounded = comicService.bindComicsToCharacter(characterId, comicsId);
+//        return areComicsBounded
+//                ? new ResponseEntity<>(HttpStatus.CREATED)
+//                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 //    }
 //
-//    @GetMapping("/comics/{id}")
-//    public String ComicsDetailsPage(@PathVariable(value = "id") long id, Model model) {
-//        try {
-//            Comics comics = comicsRepository.findById(id).orElseThrow();
-//            model.addAttribute("comics", comics);
-//            return "comics_details";
-//        } catch (NoSuchElementException ex){
-//            System.out.println("I got id " + id);
-//        }
-//        return "stub";
-//    }
-//
-//    @GetMapping("/characters/{id}/comics")
-//    public String ComicsChars(@PathVariable(value = "id") long id, Model model) {
-//        List<CharacterComics> matches = characterComicsRepository.findByCharId(id);
-//        ArrayList<Comics> comics = new ArrayList<>();
-//        for (CharacterComics match : matches) {
-//            comics.add(comicsRepository.findById(match.getComicsId()).orElseThrow());
-//        }
-//        model.addAttribute("comics", comics);
-//        return "comics_page";
+//    @DeleteMapping("characters/{characterid}/comics/{comicsid}")
+//    public ResponseEntity<?> unbindComics(@PathVariable(value = "characterid") Long characterId, @PathVariable(value = "comicsid") List<Long> comicsId) {
+//        boolean areComicsUnbounded = comicService.unbindComicsFromCharacter(characterId, comicsId);
+//        return areComicsUnbounded
+//                ? new ResponseEntity<>(HttpStatus.OK)
+//                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 //    }
 }

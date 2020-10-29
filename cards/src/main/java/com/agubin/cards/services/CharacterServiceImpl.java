@@ -2,6 +2,7 @@ package com.agubin.cards.services;
 
 import com.agubin.cards.exceptions.InvalidEntityException;
 import com.agubin.cards.exceptions.NonExistingCharacterException;
+import com.agubin.cards.exceptions.ResourceNotFoundException;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.repo.CharacterComicsRepository;
@@ -45,6 +46,11 @@ public class CharacterServiceImpl implements CharacterService {
         return characterRepository.findById(characterId);
     }
 
+    @Override
+    public boolean isCharacterExists(Long characterId) {
+        return characterRepository.existsById(characterId);
+    }
+
     private Optional<Character> saveAndCheckCharacterEntity(Character character) {
         Character result = characterRepository.save(character);
         return result.getId().equals(character.getId())
@@ -72,28 +78,32 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     @Override
-    public Optional<Character> updateCharacter(Character character) {
-        Optional<Character> characterStub = characterRepository.findById(character.getId());
-        if (characterStub.isPresent()) {
-            Character updatedCharacter = characterStub.get();
-            if (character.getName() != null) {
-                updatedCharacter.setName(character.getName());
-            }
-            if (character.getDescription() != null) {
-                updatedCharacter.setDescription(character.getDescription());
-            }
-            return saveAndCheckCharacterEntity(character);
+    public Optional<Character> updateCharacter(Long characterId, Character character) throws ResourceNotFoundException {
+        Optional<Character> characterObj = characterRepository.findById(character.getId());
+        if (!characterObj.isPresent()) {
+            throw new ResourceNotFoundException("Character with Id=" + characterId + " not found");
         }
-        return Optional.empty();
+        Character updatedCharacter = characterObj.get();
+        if (character.getName() != null) {
+            updatedCharacter.setName(character.getName());
+        }
+        if (character.getDescription() != null) {
+            updatedCharacter.setDescription(character.getDescription());
+        }
+        return saveAndCheckCharacterEntity(character);
     }
 
     @Override
-    public boolean deleteCharacter(Long characterId) {
-        if (characterRepository.existsById(characterId)) {
+    public boolean deleteCharacter(Long characterId) throws ResourceNotFoundException {
+        if (!characterRepository.existsById(characterId)) {
+            throw new ResourceNotFoundException("Character with Id=" + characterId + " not found");
+        }
+        try {
             characterRepository.deleteById(characterId);
             return true;
+        } catch (Exception exception) {
+            return false;
         }
-        return false;
     }
 
     @Override
