@@ -1,6 +1,14 @@
 package com.agubin.cards.exceptions;
 
-public interface CustomException {
+public class CustomException extends RuntimeException{
 
-    String getErrorMessage();
+    protected String errorMessage;
+
+    public CustomException() {
+        this.errorMessage = "Empty error message";
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
 }

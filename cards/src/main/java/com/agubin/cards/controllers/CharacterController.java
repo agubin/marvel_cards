@@ -1,7 +1,8 @@
 package com.agubin.cards.controllers;
 
-import com.agubin.cards.exceptions.InvalidEntityException;
+import com.agubin.cards.exceptions.CustomException;
 import com.agubin.cards.exceptions.ResourceNotFoundException;
+import com.agubin.cards.exceptions.ResourceTypes;
 import com.agubin.cards.exceptions.UnexpectedBehaviourException;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
@@ -32,92 +33,60 @@ public class CharacterController {
     @Autowired
     private ComicService comicService;
 
+
+    //Реализовать оптимизированную выборку из БД
     @GetMapping("/characters")
     public ResponseEntity<CharactersCollectionResRepr> getCharacters(@RequestParam Map<String, String> allQueryParams) {
         List<Character> characters = characterService.getCharacters(allQueryParams);
-        if (characters.isEmpty()) {
-            throw new UnexpectedBehaviourException();
-        }
         return new ResponseEntity<>(new CharactersCollectionResRepr(characters), HttpStatus.OK);
     }
 
     @PostMapping("/characters")
     public ResponseEntity<?> postCharacter(@RequestBody Character character) {
-        try {
-            Optional<Character> createdCharacter = characterService.createCharacter(character);
-            if (createdCharacter.isPresent()) {
-                List<Comics> comics = comicService.getCharacterComics(createdCharacter.get().getId(), new HashMap<>());
-                return ResponseEntity
-                        .created(LinkManager.getCharacterURI(createdCharacter.get().getId()))
-                        .body(new PersonalCharacterResRepr(createdCharacter.get(), comics));
-            }
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (InvalidEntityException exception) {
-            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
+        Character createdCharacter = characterService.createCharacter(character);
+        List<Comics> comics = comicService.getCharacterComics(createdCharacter.getId(), new HashMap<>());
+        return ResponseEntity
+                .created(LinkManager.getCharacterURI(createdCharacter.getId()))
+                .body(new PersonalCharacterResRepr(createdCharacter, comics));
     }
 
     @PutMapping("/characters/{characterid}")
     public ResponseEntity<?> updateCharacter(@PathVariable(value = "characterId") Long characterId, @RequestBody Character character) {
-        try {
-            Optional<Character> updatedCharacter = characterService.updateCharacter(characterId, character);
-            if (updatedCharacter.isPresent()) {
-                List<Comics> comics = comicService.getCharacterComics(updatedCharacter.get().getId(), new HashMap<>());
-                return new ResponseEntity<>(new PersonalCharacterResRepr(updatedCharacter.get(), comics), HttpStatus.CREATED);
-            }
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (ResourceNotFoundException exception) {
-            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.NOT_FOUND);
-        }
+        Character updatedCharacter = characterService.updateCharacter(characterId, character);
+        List<Comics> comics = comicService.getCharacterComics(updatedCharacter.getId(), new HashMap<>());
+        return new ResponseEntity<>(new PersonalCharacterResRepr(updatedCharacter, comics), HttpStatus.CREATED);
     }
 
     @GetMapping("/characters/{characterid}")
     public ResponseEntity<PersonalCharacterResRepr> getCharacter(@PathVariable(value = "characterid") Long characterId) {
-        Optional<Character> character = characterService.getCharacterById(characterId);
-        if (character.isPresent()) {
-            List<Comics> comics = comicService.getCharacterComics(characterId, new HashMap<>());
-            return new ResponseEntity<>(new PersonalCharacterResRepr(character.get(), comics), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Character character = characterService.getCharacterById(characterId);
+        List<Comics> comics = comicService.getCharacterComics(characterId, new HashMap<>());
+        return new ResponseEntity<>(new PersonalCharacterResRepr(character, comics), HttpStatus.OK);
     }
 
     @DeleteMapping("/characters/{characterid}")
     public ResponseEntity<?> deleteCharacter(@PathVariable(value = "characterid") Long characterId) {
-        try {
-            boolean isCharacterDeleted = characterService.deleteCharacter(characterId);
-            return isCharacterDeleted
-                    ? new ResponseEntity<>(HttpStatus.OK)
-                    : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (ResourceNotFoundException exception) {
-            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.NOT_FOUND);
-        }
+        characterService.deleteCharacter(characterId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("characters/{characterid}/portrait")
     public ResponseEntity<?> uploadImage(@PathVariable(value = "characterid") Long characterId,
                                          @RequestParam MultipartFile file) {
-        boolean isFileWritten = characterService.writeDownFile(file, characterId);
-        return isFileWritten
-                ? ResponseEntity.created(LinkManager.getCharacterPortraitURI(characterId)).build()
-                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        characterService.writeDownFile(file, characterId);
+        return ResponseEntity.created(LinkManager.getCharacterPortraitURI(characterId)).build();
     }
 
     @PutMapping("characters/{characterid}/portrait")
     public ResponseEntity<?> updateImage(@PathVariable(value = "characterid") Long characterId,
                                          @RequestParam MultipartFile file) {
-        boolean isFileUpdated = characterService.updateFile(file, characterId);
-        return isFileUpdated
-                ? new ResponseEntity<>(HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        characterService.updateFile(file, characterId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/characters/{characterid}/portrait")
     public ResponseEntity<?> sendImage(@PathVariable(value = "characterid") Long characterId) {
-        Optional<byte[]> Image = characterService.getImageById(characterId);
-        if (Image.isPresent()) {
-            byte[] bImage = Image.get();
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        byte[] bImage = characterService.getImageById(characterId);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));
     }
 }

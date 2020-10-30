@@ -111,7 +111,7 @@ public class CharacterComicServiceImpl implements CharacterComicService {
 
     private void checkResourceExisting(CrudRepository<?, Long> repository, Long resourceId, String resourceName) throws ResourceNotFoundException {
         if (!repository.existsById(resourceId)) {
-            throw new ResourceNotFoundException(resourceName + " with id=" + resourceId + " not found");
+            throw new ResourceNotFoundException(resourceName, resourceId);
         }
     }
 

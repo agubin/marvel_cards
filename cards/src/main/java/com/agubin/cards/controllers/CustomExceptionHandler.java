@@ -22,6 +22,10 @@ public class CustomExceptionHandler {
             status = HttpStatus.CONFLICT;
         } else if (ex.getClass().isAssignableFrom(InvalidEntityException.class)) {
             status = HttpStatus.UNPROCESSABLE_ENTITY;
+        } else if (ex.getClass().isAssignableFrom(ResourceAlreadyExistsException.class)) {
+            status = HttpStatus.CONFLICT;
+        } else if (ex.getClass().isAssignableFrom(InvalidDataException.class)) {
+            status = HttpStatus.BAD_REQUEST;
         } else {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }

@@ -1,17 +1,21 @@
 package com.agubin.cards.exceptions;
 
-import java.util.List;
 
-public class ResourceNotFoundException extends RuntimeException implements CustomException {
+public class ResourceNotFoundException extends CustomException {
 
-    private String errorMessage;
-
-    public ResourceNotFoundException(String errMes) {
-        super();
-        this.errorMessage = errMes;
+    public ResourceNotFoundException(String resType, Long id) {
+        this.errorMessage = getMessage(resType, id);
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
+    private String getMessage(String resType, Long id) {
+        switch (resType) {
+            case ResourceTypes.CHR:
+            case ResourceTypes.COM:
+                return resType + " with id=" + id + " not found!";
+            case ResourceTypes.IMG:
+                return resType + "for character with id=" + id + "not found!";
+            default:
+                return "The Resource not found!";
+        }
     }
 }

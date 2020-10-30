@@ -1,12 +1,11 @@
 package com.agubin.cards.services;
 
-import com.agubin.cards.exceptions.InvalidEntityException;
-import com.agubin.cards.exceptions.NonExistingCharacterException;
-import com.agubin.cards.exceptions.ResourceNotFoundException;
+import com.agubin.cards.exceptions.*;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.repo.CharacterComicsRepository;
 import com.agubin.cards.repo.CharacterRepository;
+import com.agubin.cards.utils.FileHandler;
 import com.agubin.cards.utils.SortFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,28 +35,26 @@ public class CharacterServiceImpl implements CharacterService {
     public List<Character> getCharacters(Map<String, String> allQueryParams) {
         List<Character> characters = new ArrayList<>();
         characterRepository.findAll().forEach(characters::add);
+        if (characters.isEmpty()) {
+            throw new UnexpectedBehaviourException();
+        }
         characters = (List<Character>) SortFilter.sortAndFilter(characters, allQueryParams);
 
         return characters;
     }
 
     @Override
-    public Optional<Character> getCharacterById(Long characterId) {
-        return characterRepository.findById(characterId);
+    public Character getCharacterById(Long characterId) {
+        Optional<Character> character = characterRepository.findById(characterId);
+        if (!character.isPresent()) {
+            throw new ResourceNotFoundException(ResourceTypes.CHR, characterId);
+        }
+        return character.get();
     }
 
-    @Override
-    public boolean isCharacterExists(Long characterId) {
-        return characterRepository.existsById(characterId);
-    }
-
-    private Optional<Character> saveAndCheckCharacterEntity(Character character) {
+    private Character saveCharacterEntity(Character character) {
         Character result = characterRepository.save(character);
-        return result.getId().equals(character.getId())
-                && result.getName().equals(character.getName())
-                && result.getDescription().equals(character.getDescription())
-                ? Optional.of(result)
-                : Optional.empty();
+        return  result;
     }
 
     private void checkCharacterEntity(Character character) throws InvalidEntityException {
@@ -72,16 +69,16 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     @Override
-    public Optional<Character> createCharacter(Character character) throws InvalidEntityException {
+    public Character createCharacter(Character character) throws InvalidEntityException {
         checkCharacterEntity(character);
-        return saveAndCheckCharacterEntity(character);
+        return saveCharacterEntity(character);
     }
 
     @Override
-    public Optional<Character> updateCharacter(Long characterId, Character character) throws ResourceNotFoundException {
+    public Character updateCharacter(Long characterId, Character character) throws ResourceNotFoundException {
         Optional<Character> characterObj = characterRepository.findById(character.getId());
         if (!characterObj.isPresent()) {
-            throw new ResourceNotFoundException("Character with Id=" + characterId + " not found");
+            throw new ResourceNotFoundException(ResourceTypes.CHR, characterId);
         }
         Character updatedCharacter = characterObj.get();
         if (character.getName() != null) {
@@ -90,19 +87,18 @@ public class CharacterServiceImpl implements CharacterService {
         if (character.getDescription() != null) {
             updatedCharacter.setDescription(character.getDescription());
         }
-        return saveAndCheckCharacterEntity(character);
+        return saveCharacterEntity(character);
     }
 
     @Override
-    public boolean deleteCharacter(Long characterId) throws ResourceNotFoundException {
+    public void deleteCharacter(Long characterId) throws ResourceNotFoundException {
         if (!characterRepository.existsById(characterId)) {
-            throw new ResourceNotFoundException("Character with Id=" + characterId + " not found");
+            throw new ResourceNotFoundException(ResourceTypes.CHR, characterId);
         }
         try {
             characterRepository.deleteById(characterId);
-            return true;
         } catch (Exception exception) {
-            return false;
+            throw new UnexpectedBehaviourException();
         }
     }
 
@@ -116,65 +112,52 @@ public class CharacterServiceImpl implements CharacterService {
         return comicsCharacters;
     }
 
-    private boolean writeFile(MultipartFile file, Long characterId) {
-        if (!file.isEmpty() && !new File("character#" + characterId).exists()) {
-            try (BufferedOutputStream bous = new BufferedOutputStream(new FileOutputStream(new File("character#" + characterId)))) {
-                bous.write(file.getBytes());
-                return true;
-            } catch (IOException ignored) {
-            }
+
+    private void writeFile(MultipartFile file, Long characterId) {
+        if (file.isEmpty()) {
+            throw new InvalidDataException(DataCorruptionTypes.EMPTY_FILE);
         }
-        return false;
-    }
-
-    @Override
-    public boolean writeDownFile(MultipartFile file, Long characterId) {
-        return !new File("character#" + characterId).exists() && writeFile(file, characterId);
-    }
-
-    @Override
-    public boolean updateFile(MultipartFile file, Long characterId) {
-        return new File("character#" + characterId).exists() && writeFile(file, characterId);
-    }
-
-    @Override
-    public Optional<byte[]> getImageById(Long characterId) {
-        try {
-            byte[] bImage = Files.readAllBytes(Paths.get("character#" + characterId));
-            return Optional.of(bImage);
+        try (BufferedOutputStream bous = new BufferedOutputStream(new FileOutputStream(new File(FileHandler.getPortraitFileName(characterId))))) {
+            bous.write(file.getBytes());
         } catch (IOException ignored) {
+            throw new UnexpectedBehaviourException();
         }
-        return Optional.empty();
     }
 
-    private void checkCharactersIdList(List<Long> charactersId) throws NonExistingCharacterException {
-        ArrayList<Long> nonExistingCharactersId = new ArrayList<>();
-        for (Long characterId: charactersId) {
-            if (!characterRepository.existsById(characterId)) {
-                nonExistingCharactersId.add(characterId);
-            }
-        }
-        if (!nonExistingCharactersId.isEmpty()) {
-            throw new NonExistingCharacterException(nonExistingCharactersId);
-        }
+    private boolean characterPortraitExist(Long characterId) {
+        return new File(FileHandler.getPortraitFileName(characterId)).exists();
     }
 
     @Override
-    public void bindCharactersToComic(Long comicId, List<Long> charactersId) throws NonExistingCharacterException {
-        checkCharactersIdList(charactersId);
-        for (Long characterId : charactersId) {
-            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-                characterComicsRepository.save(new CharacterComics(characterId, comicId));
-            }
+    public void writeDownFile(MultipartFile file, Long characterId) {
+        if (characterPortraitExist(characterId)) {
+            throw new ResourceAlreadyExistsException(ResourceTypes.IMG, characterId);
         }
+        writeFile(file, characterId);
     }
 
     @Override
-    public void unbindCharactersFromComic(Long comicId, List<Long> charactersId) throws NonExistingCharacterException {
-        checkCharactersIdList(charactersId);
-        for (Long characterId : charactersId) {
-            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
+    public void updateFile(MultipartFile file, Long characterId) {
+        if (!characterPortraitExist(characterId)) {
+            throw new ResourceNotFoundException(ResourceTypes.IMG, characterId);
         }
+        writeFile(file, characterId);
+    }
+
+    @Override
+    public byte[] getImageById(Long characterId) {
+        if (!characterPortraitExist(characterId)) {
+            throw new ResourceNotFoundException(ResourceTypes.IMG, characterId);
+        }
+        byte[] bImage;
+        try {
+            bImage = Files.readAllBytes(Paths.get(FileHandler.getPortraitFileName(characterId)));
+        } catch (IOException ignored) {
+            throw new UnexpectedBehaviourException();
+        }
+        if (bImage.length == 0) {
+            throw new UnexpectedBehaviourException();
+        }
+        return bImage;
     }
 }

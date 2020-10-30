@@ -1,15 +1,8 @@
 package com.agubin.cards.exceptions;
 
-public class InvalidEntityException extends RuntimeException implements CustomException {
-
-    private String errorMessage;
+public class InvalidEntityException extends CustomException {
 
     public InvalidEntityException(String errMes) {
-        super();
         this.errorMessage = errMes;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
     }
 }
