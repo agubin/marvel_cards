@@ -1,7 +1,6 @@
 package com.agubin.cards.services;
 
-import com.agubin.cards.exceptions.NonExistingCharacterException;
-import com.agubin.cards.exceptions.ResourceNotFoundException;
+import com.agubin.cards.exceptions.*;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.models.Comics;
@@ -31,44 +30,45 @@ public class CharacterComicServiceImpl implements CharacterComicService {
 
     @Override
     public List<Character> getComicCharacters(Long comicId, Map<String, String> allQueryParams) throws ResourceNotFoundException {
-        checkResourceExisting(comicsRepository, comicId, "Comic");
-        List<Character> comicsCharacters = new ArrayList<>();
+        checkResourceExisting(comicsRepository, comicId, ResourceTypes.COM);
+        List<Character> comicCharacters = new ArrayList<>();
         for (CharacterComics cc : characterComicsRepository.findByComicsId(comicId)) {
-            comicsCharacters.add(characterRepository.findById(cc.getCharId()).get());
+            comicCharacters.add(characterRepository.findById(cc.getCharId()).get());
         }
-        comicsCharacters = (List<Character>) SortFilter.sortAndFilter(comicsCharacters, allQueryParams);
-        return comicsCharacters;
+        if (comicCharacters.isEmpty()) {
+            throw new UnexpectedBehaviourException();
+        }
+        comicCharacters = (List<Character>) SortFilter.sortAndFilter(comicCharacters, allQueryParams);
+        return comicCharacters;
     }
 
     @Override
     public void bindCharactersToComic(Long comicId, List<Long> charactersId) throws ResourceNotFoundException, NonExistingCharacterException {
-        checkResourceExisting(comicsRepository, comicId, "Comic");
-        checkResourcesIdList(characterRepository, charactersId);
+        checkResourceExisting(comicsRepository, comicId, ResourceTypes.COM);
+        checkResourcesIdList(characterRepository, charactersId, ResourceTypes.CHR);
         for (Long characterId : charactersId) {
             createCharacterComic(characterId, comicId);
-//            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-//                characterComicsRepository.save(new CharacterComics(characterId, comicId));
-//            }
         }
     }
 
     @Override
     public void unbindCharactersFromComic(Long comicId, List<Long> charactersId) throws ResourceNotFoundException, NonExistingCharacterException {
-        checkResourceExisting(comicsRepository, comicId, "Comic");
-        checkResourcesIdList(characterRepository, charactersId);
+        checkResourceExisting(comicsRepository, comicId, ResourceTypes.COM);
+        checkResourcesIdList(characterRepository, charactersId, ResourceTypes.CHR);
         for (Long characterId : charactersId) {
             deleteCharacterComic(characterId, comicId);
-//            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-//            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
         }
     }
 
     @Override
     public List<Comics> getCharacterComics(Long characterId, Map<String, String> allQueryParams) throws ResourceNotFoundException {
-        checkResourceExisting(characterRepository, characterId, "Character");
+        checkResourceExisting(characterRepository, characterId, ResourceTypes.CHR);
         List<Comics> characterComics = new ArrayList<>();
         for (CharacterComics cc: characterComicsRepository.findByCharId(characterId)) {
             characterComics.add(comicsRepository.findById(cc.getComicsId()).get());
+        }
+        if (characterComics.isEmpty()) {
+            throw new UnexpectedBehaviourException();
         }
         characterComics = (List<Comics>) SortFilter.sortAndFilter(characterComics, allQueryParams);
         return characterComics;
@@ -76,28 +76,23 @@ public class CharacterComicServiceImpl implements CharacterComicService {
 
     @Override
     public void bindComicsToCharacter(Long characterId, List<Long> comicsId) throws ResourceNotFoundException, NonExistingCharacterException {
-        checkResourceExisting(characterRepository, characterId, "Character");
-        checkResourcesIdList(comicsRepository, comicsId);
+        checkResourceExisting(characterRepository, characterId, ResourceTypes.CHR);
+        checkResourcesIdList(comicsRepository, comicsId, ResourceTypes.COM);
         for (Long comicId : comicsId) {
             createCharacterComic(characterId, comicId);
-//            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-//                characterComicsRepository.save(new CharacterComics(characterId, comicId));
-//            }
         }
     }
 
     @Override
     public void unbindComicsFromCharacter(Long characterId, List<Long> comicsId) throws ResourceNotFoundException, NonExistingCharacterException {
-        checkResourceExisting(characterRepository, characterId, "Character");
-        checkResourcesIdList(comicsRepository, comicsId);
+        checkResourceExisting(characterRepository, characterId, ResourceTypes.CHR);
+        checkResourcesIdList(comicsRepository, comicsId, ResourceTypes.COM);
         for (Long comicId : comicsId) {
             deleteCharacterComic(characterId, comicId);
-//            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-//            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
         }
     }
 
-    private void checkResourcesIdList(CrudRepository<?, Long> repository, List<Long> resourcesId) throws NonExistingCharacterException {
+    private void checkResourcesIdList(CrudRepository<?, Long> repository, List<Long> resourcesId, String resourceType) throws NonExistingCharacterException {
         ArrayList<Long> nonExistingResourcesId = new ArrayList<>();
         for (Long resourceId: resourcesId) {
             if (!repository.existsById(resourceId)) {
@@ -105,48 +100,28 @@ public class CharacterComicServiceImpl implements CharacterComicService {
             }
         }
         if (!nonExistingResourcesId.isEmpty()) {
-            throw new NonExistingCharacterException(nonExistingResourcesId);
+            throw new ResourceNotFoundException(resourceType, nonExistingResourcesId);
         }
     }
 
-    private void checkResourceExisting(CrudRepository<?, Long> repository, Long resourceId, String resourceName) throws ResourceNotFoundException {
+    private void checkResourceExisting(CrudRepository<?, Long> repository, Long resourceId, String resourceType) throws ResourceNotFoundException {
         if (!repository.existsById(resourceId)) {
-            throw new ResourceNotFoundException(resourceName, resourceId);
+            throw new ResourceNotFoundException(resourceType, resourceId);
         }
     }
 
     private void createCharacterComic(Long characterId, Long comicId) {
-        if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-            characterComicsRepository.save(new CharacterComics(characterId, comicId));
+        if (characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
+            throw new ResourceAlreadyExistsException(ResourceTypes.CHR_COM, characterId, comicId);
         }
+        characterComicsRepository.save(new CharacterComics(characterId, comicId));
     }
 
     private void deleteCharacterComic(Long characterId, Long comicId) {
         Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-        characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
+        if (!characterComics.isPresent()) {
+            throw new ResourceNotFoundException(ResourceTypes.CHR_COM, characterId, comicId);
+        }
+        characterComicsRepository.delete(characterComics.get());
     }
-
-//    private void checkCharactersIdList(List<Long> charactersId) throws NonExistingCharacterException {
-//        ArrayList<Long> nonExistingCharactersId = new ArrayList<>();
-//        for (Long characterId: charactersId) {
-//            if (!characterRepository.existsById(characterId)) {
-//                nonExistingCharactersId.add(characterId);
-//            }
-//        }
-//        if (!nonExistingCharactersId.isEmpty()) {
-//            throw new NonExistingCharacterException(nonExistingCharactersId);
-//        }
-//    }
-//
-//    private void checkComicExisting(Long comicId) throws ResourceNotFoundException{
-//        if (!comicsRepository.existsById(comicId)) {
-//            throw new ResourceNotFoundException("Comic with id=" + comicId + " not found");
-//        }
-//    }
-//
-//    private void checkCharacterExisting(Long characterId) throws ResourceNotFoundException{
-//        if (!comicsRepository.existsById(characterId)) {
-//            throw new ResourceNotFoundException("Character with id=" + characterId + " not found");
-//        }
-//    }
 }
