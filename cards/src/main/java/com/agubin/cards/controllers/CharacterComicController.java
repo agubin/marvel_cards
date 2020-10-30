@@ -11,6 +11,7 @@ import com.agubin.cards.utils.CharactersCollectionResRepr;
 import com.agubin.cards.utils.ComicsCollectionResRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,14 +72,8 @@ public class CharacterComicController {
 
     @PutMapping("characters/{characterid}/comics")
     public ResponseEntity<?> bindComics(@PathVariable(value = "characterid") Long characterId, @RequestBody List<Long> comicsId) {
-        try {
-            characterComicService.bindComicsToCharacter(characterId, comicsId);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (NonExistingCharacterException exception) {
-            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.CONFLICT);
-        } catch (ResourceNotFoundException exception) {
-            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.NOT_FOUND);
-        }
+        characterComicService.bindComicsToCharacter(characterId, comicsId);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("characters/{characterid}/comics/{comicsid}")

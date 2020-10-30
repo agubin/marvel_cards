@@ -68,29 +68,4 @@ public class ComicController {
                 ? new ResponseEntity<>(HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
-
-//    @GetMapping("/characters/{characterid}/comics")
-//    public ResponseEntity<ComicsCollectionResRepr> getCharacterComic(@RequestParam Map<String, String> allQueryParams,
-//                                                          @PathVariable(value = "characterid") Long characterId) {
-//        List<Comics> comics = comicService.getCharacterComics(characterId, allQueryParams);
-//        return !comics.isEmpty()
-//                ? new ResponseEntity<>(new ComicsCollectionResRepr(comics, characterId), HttpStatus.OK)
-//                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
-//
-//    @PutMapping("characters/{characterid}/comics")
-//    public ResponseEntity<?> bindComics(@PathVariable(value = "characterid") Long characterId, @RequestBody List<Long> comicsId) {
-//        boolean areComicsBounded = comicService.bindComicsToCharacter(characterId, comicsId);
-//        return areComicsBounded
-//                ? new ResponseEntity<>(HttpStatus.CREATED)
-//                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-//    }
-//
-//    @DeleteMapping("characters/{characterid}/comics/{comicsid}")
-//    public ResponseEntity<?> unbindComics(@PathVariable(value = "characterid") Long characterId, @PathVariable(value = "comicsid") List<Long> comicsId) {
-//        boolean areComicsUnbounded = comicService.unbindComicsFromCharacter(characterId, comicsId);
-//        return areComicsUnbounded
-//                ? new ResponseEntity<>(HttpStatus.OK)
-//                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-//    }
 }

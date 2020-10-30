@@ -1,8 +1,8 @@
 package com.agubin.cards.controllers;
 
 import com.agubin.cards.exceptions.InvalidEntityException;
-import com.agubin.cards.exceptions.NonExistingCharacterException;
 import com.agubin.cards.exceptions.ResourceNotFoundException;
+import com.agubin.cards.exceptions.UnexpectedBehaviourException;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
 import com.agubin.cards.services.CharacterService;
@@ -35,9 +35,10 @@ public class CharacterController {
     @GetMapping("/characters")
     public ResponseEntity<CharactersCollectionResRepr> getCharacters(@RequestParam Map<String, String> allQueryParams) {
         List<Character> characters = characterService.getCharacters(allQueryParams);
-        return !characters.isEmpty()
-                ? new ResponseEntity<>(new CharactersCollectionResRepr(characters), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        if (characters.isEmpty()) {
+            throw new UnexpectedBehaviourException();
+        }
+        return new ResponseEntity<>(new CharactersCollectionResRepr(characters), HttpStatus.OK);
     }
 
     @PostMapping("/characters")
@@ -91,35 +92,6 @@ public class CharacterController {
             return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.NOT_FOUND);
         }
     }
-
-//    @GetMapping("/comics/{comicid}/characters")
-//    public ResponseEntity<CharactersCollectionResRepr> getComicsCharacters(@RequestParam Map<String, String> allQueryParams,
-//                                                               @PathVariable(value = "comicid") Long comicId) {
-//        List<Character> characters = characterService.getComicsCharacters(comicId, allQueryParams);
-//        return !characters.isEmpty()
-//                ? new ResponseEntity<>(new CharactersCollectionResRepr(characters, comicId), HttpStatus.OK)
-//                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//    }
-//
-//    @PutMapping("comics/{comicid}/characters")
-//    public ResponseEntity<?> bindCharacters(@PathVariable(value = "comicid") Long comicId, @RequestBody List<Long> charactersId) {
-//        try {
-//            characterService.bindCharactersToComic(comicId, charactersId);
-//            return new ResponseEntity<>(HttpStatus.CREATED);
-//        } catch (NonExistingCharacterException exception) {
-//            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.CONFLICT);
-//        }
-//    }
-//
-//    @DeleteMapping("comics/{comicid}/characters/{charactersid}")
-//    public ResponseEntity<?> unbindCharacters(@PathVariable(value = "comicid") Long comicId, @PathVariable(value = "charactersid") List<Long> charactersId) {
-//        try {
-//            characterService.unbindCharactersFromComic(comicId, charactersId);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        } catch (NonExistingCharacterException exception) {
-//            return new ResponseEntity<>(exception.getErrorMessage(), HttpStatus.CONFLICT);
-//        }
-//    }
 
     @PostMapping("characters/{characterid}/portrait")
     public ResponseEntity<?> uploadImage(@PathVariable(value = "characterid") Long characterId,

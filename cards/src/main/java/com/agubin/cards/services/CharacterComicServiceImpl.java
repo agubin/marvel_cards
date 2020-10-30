@@ -45,9 +45,10 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         checkResourceExisting(comicsRepository, comicId, "Comic");
         checkResourcesIdList(characterRepository, charactersId);
         for (Long characterId : charactersId) {
-            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-                characterComicsRepository.save(new CharacterComics(characterId, comicId));
-            }
+            createCharacterComic(characterId, comicId);
+//            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
+//                characterComicsRepository.save(new CharacterComics(characterId, comicId));
+//            }
         }
     }
 
@@ -56,8 +57,9 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         checkResourceExisting(comicsRepository, comicId, "Comic");
         checkResourcesIdList(characterRepository, charactersId);
         for (Long characterId : charactersId) {
-            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
+            deleteCharacterComic(characterId, comicId);
+//            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
+//            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
         }
     }
 
@@ -77,9 +79,10 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         checkResourceExisting(characterRepository, characterId, "Character");
         checkResourcesIdList(comicsRepository, comicsId);
         for (Long comicId : comicsId) {
-            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-                characterComicsRepository.save(new CharacterComics(characterId, comicId));
-            }
+            createCharacterComic(characterId, comicId);
+//            if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
+//                characterComicsRepository.save(new CharacterComics(characterId, comicId));
+//            }
         }
     }
 
@@ -88,8 +91,9 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         checkResourceExisting(characterRepository, characterId, "Character");
         checkResourcesIdList(comicsRepository, comicsId);
         for (Long comicId : comicsId) {
-            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
+            deleteCharacterComic(characterId, comicId);
+//            Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
+//            characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
         }
     }
 
@@ -109,6 +113,17 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         if (!repository.existsById(resourceId)) {
             throw new ResourceNotFoundException(resourceName + " with id=" + resourceId + " not found");
         }
+    }
+
+    private void createCharacterComic(Long characterId, Long comicId) {
+        if (!characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
+            characterComicsRepository.save(new CharacterComics(characterId, comicId));
+        }
+    }
+
+    private void deleteCharacterComic(Long characterId, Long comicId) {
+        Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
+        characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
     }
 
 //    private void checkCharactersIdList(List<Long> charactersId) throws NonExistingCharacterException {

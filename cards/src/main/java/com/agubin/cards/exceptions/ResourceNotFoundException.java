@@ -2,11 +2,12 @@ package com.agubin.cards.exceptions;
 
 import java.util.List;
 
-public class ResourceNotFoundException extends Exception {
+public class ResourceNotFoundException extends RuntimeException implements CustomException {
 
     private String errorMessage;
 
     public ResourceNotFoundException(String errMes) {
+        super();
         this.errorMessage = errMes;
     }
 
