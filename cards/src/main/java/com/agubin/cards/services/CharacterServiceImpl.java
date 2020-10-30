@@ -60,7 +60,7 @@ public class CharacterServiceImpl implements CharacterService {
     private void checkCharacterEntity(Character character) throws InvalidEntityException {
         StringBuffer errorMessage = new StringBuffer();
         if (character.getName() == null) {
-            errorMessage.append("Name filed is required!");
+            errorMessage.append("Name field is required!");
         }
         if (character.getDescription() == null) {
             errorMessage.append("Description field is required!");

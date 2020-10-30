@@ -1,6 +1,10 @@
 package com.agubin.cards.services;
 
 
+import com.agubin.cards.exceptions.InvalidEntityException;
+import com.agubin.cards.exceptions.ResourceNotFoundException;
+import com.agubin.cards.exceptions.ResourceTypes;
+import com.agubin.cards.exceptions.UnexpectedBehaviourException;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.models.Comics;
 import com.agubin.cards.repo.CharacterComicsRepository;
@@ -26,37 +30,73 @@ public class ComicServiceImpl implements ComicService {
     public List<Comics> getComics(Map<String, String> allQueryParams) {
         List<Comics> comics = new ArrayList<>();
         comicsRepository.findAll().forEach(comics::add);
+        if (comics.isEmpty()) {
+            throw new UnexpectedBehaviourException();
+        }
         comics = (List<Comics>) SortFilter.sortAndFilter(comics, allQueryParams);
         return comics;
     }
 
-    private boolean saveAndCheckComicEntity(Comics comic) {
+    private Comics saveComicEntity(Comics comic) {
         Comics result = comicsRepository.save(comic);
-        return result.getId().equals(comic.getId())
-                && result.getTitle().equals(comic.getTitle())
-                && result.getDescription().equals(comic.getDescription())
-                && result.getCreators().equals(comic.getCreators());
+        return result;
+    }
+
+    private void checkComicEntity(Comics comic) throws InvalidEntityException {
+        StringBuffer errorMessage = new StringBuffer();
+        if (comic.getTitle() == null) {
+            errorMessage.append("Title field is required!");
+        }
+        if (comic.getDescription() == null) {
+            errorMessage.append("Description field is required!");
+        }
+        throw new InvalidEntityException(errorMessage.toString());
     }
 
     @Override
-    public boolean createComic(Comics comic) {
-        return saveAndCheckComicEntity(comic);
+    public Comics createComic(Comics comic) {
+        checkComicEntity(comic);
+        return saveComicEntity(comic);
     }
 
     @Override
-    public boolean updateComic(Comics comic) {
-        return saveAndCheckComicEntity(comic);
+    public Comics updateComic(Long comicId, Comics comic) {
+        Optional<Comics> comicObj = comicsRepository.findById(comicId);
+        if(!comicObj.isPresent()) {
+            throw new ResourceNotFoundException(ResourceTypes.COM, comicId);
+        }
+        Comics updatedComic = comicObj.get();
+        if (comic.getTitle() != null) {
+            updatedComic.setTitle(comic.getTitle());
+        }
+        if (comic.getDescription() != null) {
+            updatedComic.setDescription(comic.getDescription());
+        }
+        if (comic.getCreators() != null) {
+            updatedComic.setCreators(comic.getCreators());
+        }
+        return saveComicEntity(updatedComic);
     }
 
     @Override
-    public Optional<Comics> getComicById(Long comicId) {
-        return comicsRepository.findById(comicId);
+    public Comics getComicById(Long comicId) {
+        Optional<Comics> comic  = comicsRepository.findById(comicId);
+        if (!comic.isPresent()) {
+            throw new ResourceNotFoundException(ResourceTypes.COM, comicId);
+        }
+        return comic.get();
     }
 
     @Override
-    public boolean deleteComic(Long comicId) {
-        comicsRepository.deleteById(comicId);
-        return !comicsRepository.findById(comicId).isPresent();
+    public void deleteComic(Long comicId) {
+        if (!comicsRepository.existsById(comicId)) {
+            throw new ResourceNotFoundException(ResourceTypes.COM, comicId);
+        }
+        try {
+            comicsRepository.deleteById(comicId);
+        } catch (Exception exception) {
+            throw new UnexpectedBehaviourException();
+        }
     }
 
     @Override
@@ -68,38 +108,5 @@ public class ComicServiceImpl implements ComicService {
         }
         characterComics = (List<Comics>) SortFilter.sortAndFilter(characterComics, allQueryParams);
         return characterComics;
-    }
-
-
-    private boolean checkComicsIdList(List<Long> comicsId) {
-        for (Long comicId: comicsId) {
-            if (!comicsRepository.findById(comicId).isPresent()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean bindComicsToCharacter(Long characterId, List<Long> comicsId) {
-        if (checkComicsIdList(comicsId)) {
-            for (Long comicId : comicsId) {
-                characterComicsRepository.save(new CharacterComics(characterId, comicId));
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean unbindComicsFromCharacter(Long characterId, List<Long> comicsId) {
-        if (checkComicsIdList(comicsId)) {
-            for (Long comicId : comicsId) {
-                Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
-                characterComics.ifPresent(charComics -> characterComicsRepository.delete(charComics));
-            }
-            return true;
-        }
-        return false;
     }
 }

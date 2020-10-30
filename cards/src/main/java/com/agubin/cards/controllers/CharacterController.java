@@ -1,9 +1,5 @@
 package com.agubin.cards.controllers;
 
-import com.agubin.cards.exceptions.CustomException;
-import com.agubin.cards.exceptions.ResourceNotFoundException;
-import com.agubin.cards.exceptions.ResourceTypes;
-import com.agubin.cards.exceptions.UnexpectedBehaviourException;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
 import com.agubin.cards.services.CharacterService;
@@ -23,7 +19,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 public class CharacterController {

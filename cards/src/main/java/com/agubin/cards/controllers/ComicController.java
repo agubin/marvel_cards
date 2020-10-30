@@ -6,6 +6,7 @@ import com.agubin.cards.models.Comics;
 import com.agubin.cards.services.CharacterService;
 import com.agubin.cards.services.ComicService;
 import com.agubin.cards.utils.ComicsCollectionResRepr;
+import com.agubin.cards.utils.LinkManager;
 import com.agubin.cards.utils.PersonalComicResRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 public class ComicController {
@@ -30,42 +30,35 @@ public class ComicController {
     @GetMapping("/comics")
     public ResponseEntity<ComicsCollectionResRepr> getComics(@RequestParam Map<String, String> allQueryParams) {
         List<Comics> comics = comicService.getComics(allQueryParams);
-        return !comics.isEmpty()
-                ? new ResponseEntity<>(new ComicsCollectionResRepr(comics), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ComicsCollectionResRepr(comics), HttpStatus.OK);
     }
 
     @PostMapping("/comics")
     public ResponseEntity<?> postComic(@RequestBody Comics comic) {
-        boolean isComicCreated = comicService.createComic(comic);
-        return isComicCreated
-                ? new ResponseEntity<>(HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        Comics createdComic = comicService.createComic(comic);
+        List<Character> characters = characterService.getComicsCharacters(createdComic.getId(), new HashMap<>());
+        return ResponseEntity
+                .created(LinkManager.getCharacterURI(createdComic.getId()))
+                .body(new PersonalComicResRepr(createdComic, characters));
     }
 
-    @PutMapping("/comics")
-    public ResponseEntity<?> updateComic(@RequestBody Comics comic) {
-        boolean isComicUpdated = comicService.updateComic(comic);
-        return isComicUpdated
-                ? new ResponseEntity<>(HttpStatus.CREATED)
-                : new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+    @PutMapping("/comics/{comicid}")
+    public ResponseEntity<?> updateComic(@PathVariable(value = "comicid") Long comicId, @RequestBody Comics comic) {
+        Comics updatedComic = comicService.updateComic(comicId, comic);
+        List<Character> characters = characterService.getComicsCharacters(updatedComic.getId(), new HashMap<>());
+        return new ResponseEntity<>(new PersonalComicResRepr(updatedComic, characters), HttpStatus.CREATED);
     }
 
     @GetMapping("/comics/{comicid}")
     public ResponseEntity<PersonalComicResRepr> getComic(@PathVariable(value = "comicid") Long comicId) {
-        Optional<Comics> comic = comicService.getComicById(comicId);
-        if (comic.isPresent()) {
-            List<Character> characters = characterService.getComicsCharacters(comicId, new HashMap<>());
-            return new ResponseEntity<>(new PersonalComicResRepr(comic.get(), characters), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Comics comic = comicService.getComicById(comicId);
+        List<Character> characters = characterService.getComicsCharacters(comicId, new HashMap<>());
+        return new ResponseEntity<>(new PersonalComicResRepr(comic, characters), HttpStatus.OK);
     }
 
     @DeleteMapping("/comics/{comicid}")
     public ResponseEntity<Comics> deleteComic(@PathVariable(value = "comicid") Long comicId) {
-        boolean isComicDeleted = comicService.deleteComic(comicId);
-        return isComicDeleted
-                ? new ResponseEntity<>(HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        comicService.deleteComic(comicId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

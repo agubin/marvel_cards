@@ -5,13 +5,10 @@ import com.agubin.cards.exceptions.ResourceNotFoundException;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
 import com.agubin.cards.services.CharacterComicService;
-import com.agubin.cards.services.CharacterService;
-import com.agubin.cards.services.ComicService;
 import com.agubin.cards.utils.CharactersCollectionResRepr;
 import com.agubin.cards.utils.ComicsCollectionResRepr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
