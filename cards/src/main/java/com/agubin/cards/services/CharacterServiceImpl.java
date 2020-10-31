@@ -117,21 +117,22 @@ public class CharacterServiceImpl implements CharacterService {
         if (file.isEmpty()) {
             throw new InvalidDataException(DataCorruptionTypes.EMPTY_FILE);
         }
-        try (BufferedOutputStream bous = new BufferedOutputStream(new FileOutputStream(new File(FileHandler.getPortraitFileName(characterId))))) {
-            bous.write(file.getBytes());
-        } catch (IOException ignored) {
+        try {
+            FileHandler.storeFile(file, ResourceTypes.CHR_IMG, characterId);
+        } catch (IOException ex) {
+            System.out.println(ex);
             throw new UnexpectedBehaviourException();
         }
     }
 
     private boolean characterPortraitExist(Long characterId) {
-        return new File(FileHandler.getPortraitFileName(characterId)).exists();
+        return FileHandler.checkFileExist(ResourceTypes.CHR_IMG, characterId);
     }
 
     @Override
     public void writeDownFile(MultipartFile file, Long characterId) {
         if (characterPortraitExist(characterId)) {
-            throw new ResourceAlreadyExistsException(ResourceTypes.IMG, characterId);
+            throw new ResourceAlreadyExistsException(ResourceTypes.CHR_IMG, characterId);
         }
         writeFile(file, characterId);
     }
@@ -139,7 +140,7 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public void updateFile(MultipartFile file, Long characterId) {
         if (!characterPortraitExist(characterId)) {
-            throw new ResourceNotFoundException(ResourceTypes.IMG, characterId);
+            throw new ResourceNotFoundException(ResourceTypes.CHR_IMG, characterId);
         }
         writeFile(file, characterId);
     }
@@ -147,12 +148,13 @@ public class CharacterServiceImpl implements CharacterService {
     @Override
     public byte[] getImageById(Long characterId) {
         if (!characterPortraitExist(characterId)) {
-            throw new ResourceNotFoundException(ResourceTypes.IMG, characterId);
+            throw new ResourceNotFoundException(ResourceTypes.CHR_IMG, characterId);
         }
         byte[] bImage;
         try {
-            bImage = Files.readAllBytes(Paths.get(FileHandler.getPortraitFileName(characterId)));
-        } catch (IOException ignored) {
+            bImage = FileHandler.retrieveFile(ResourceTypes.CHR_IMG, characterId);
+        } catch (IOException ex) {
+            System.out.println(ex);
             throw new UnexpectedBehaviourException();
         }
         if (bImage.length == 0) {

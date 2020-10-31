@@ -24,7 +24,7 @@ public class ResourceNotFoundException extends CustomException {
             case ResourceTypes.CHR:
             case ResourceTypes.COM:
                 return resType + " with id=" + id + " not found!";
-            case ResourceTypes.IMG:
+            case ResourceTypes.CHR_IMG:
                 return resType + "for character with id=" + id + "not found!";
             default:
                 return "The Resource not found!";
@@ -43,7 +43,7 @@ public class ResourceNotFoundException extends CustomException {
 
     private String getMessage(String resType, Long characterId, Long comicId) {
         switch (resType) {
-            case ResourceTypes.CHR_COM:
+            case ResourceTypes.REL_CHR_COM:
                 return String.format("Relation between %s(uri=%s) and %s(uri=%s) not found!",
                         ResourceTypes.CHR, LinkManager.getCharacterURI(characterId),
                         ResourceTypes.COM, LinkManager.getComicURI(comicId));

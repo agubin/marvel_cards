@@ -27,7 +27,7 @@ public class ResourceAlreadyExistsException extends CustomException {
             case ResourceTypes.COM:
                 uri = LinkManager.getComicURI(id);
                 break;
-            case ResourceTypes.IMG:
+            case ResourceTypes.CHR_IMG:
                 uri = LinkManager.getCharacterPortraitURI(id);
                 break;
             default:

@@ -112,7 +112,7 @@ public class CharacterComicServiceImpl implements CharacterComicService {
 
     private void createCharacterComic(Long characterId, Long comicId) {
         if (characterComicsRepository.findByCharIdAndComicsId(characterId, comicId).isPresent()) {
-            throw new ResourceAlreadyExistsException(ResourceTypes.CHR_COM, characterId, comicId);
+            throw new ResourceAlreadyExistsException(ResourceTypes.REL_CHR_COM, characterId, comicId);
         }
         characterComicsRepository.save(new CharacterComics(characterId, comicId));
     }
@@ -120,7 +120,7 @@ public class CharacterComicServiceImpl implements CharacterComicService {
     private void deleteCharacterComic(Long characterId, Long comicId) {
         Optional<CharacterComics> characterComics = characterComicsRepository.findByCharIdAndComicsId(characterId, comicId);
         if (!characterComics.isPresent()) {
-            throw new ResourceNotFoundException(ResourceTypes.CHR_COM, characterId, comicId);
+            throw new ResourceNotFoundException(ResourceTypes.REL_CHR_COM, characterId, comicId);
         }
         characterComicsRepository.delete(characterComics.get());
     }

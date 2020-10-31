@@ -26,7 +26,7 @@ public class CharacterComicController {
         return new ResponseEntity<>(new CharactersCollectionResRepr(characters, comicId), HttpStatus.OK);
     }
 
-    @PutMapping("comics/{comicid}/characters")
+    @PostMapping("comics/{comicid}/characters")
     public ResponseEntity<?> bindCharacters(@PathVariable(value = "comicid") Long comicId, @RequestBody List<Long> charactersId) {
             characterComicService.bindCharactersToComic(comicId, charactersId);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -45,7 +45,7 @@ public class CharacterComicController {
             return new ResponseEntity<>(new ComicsCollectionResRepr(comics, characterId), HttpStatus.OK);
     }
 
-    @PutMapping("characters/{characterid}/comics")
+    @PostMapping("characters/{characterid}/comics")
     public ResponseEntity<?> bindComics(@PathVariable(value = "characterid") Long characterId, @RequestBody List<Long> comicsId) {
         characterComicService.bindComicsToCharacter(characterId, comicsId);
         return new ResponseEntity<>(HttpStatus.CREATED);
