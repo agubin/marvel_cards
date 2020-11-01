@@ -56,6 +56,7 @@ public class FileHandler {
             System.out.println("Creating directory on path: " + resDirFile.getAbsolutePath() + " failed!");
             throw new UnexpectedBehaviourException();
         }
+        System.out.println(resDirFile.getAbsolutePath());
         BufferedOutputStream bous = new BufferedOutputStream(new FileOutputStream(new File(getFullResourcePath(resType, id))));
         bous.write(file.getBytes());
         bous.close();
