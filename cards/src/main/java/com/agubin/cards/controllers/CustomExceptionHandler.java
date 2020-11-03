@@ -30,7 +30,7 @@ public class CustomExceptionHandler {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
-        ExceptionData apiError = new ExceptionData(status, ex.getErrorMessage());
-        return new ResponseEntity<>(apiError, apiError.getStatus());
+        ExceptionData exceptionData = new ExceptionData(status, ex.getErrorMessage());
+        return new ResponseEntity<>(exceptionData, exceptionData.getStatus());
     }
 }

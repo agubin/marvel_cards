@@ -36,9 +36,6 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         for (CharacterComics cc : characterComicsRepository.findByComicsId(comicId)) {
             comicCharacters.add(characterRepository.findById(cc.getCharId()).get());
         }
-        if (comicCharacters.isEmpty()) {
-            throw new UnexpectedBehaviourException();
-        }
         comicCharacters = (List<Character>) SortFilter.sortAndFilter(comicCharacters, allQueryParams);
         return comicCharacters;
     }
@@ -67,9 +64,6 @@ public class CharacterComicServiceImpl implements CharacterComicService {
         List<Comics> characterComics = new ArrayList<>();
         for (CharacterComics cc: characterComicsRepository.findByCharId(characterId)) {
             characterComics.add(comicsRepository.findById(cc.getComicsId()).get());
-        }
-        if (characterComics.isEmpty()) {
-            throw new UnexpectedBehaviourException();
         }
         characterComics = (List<Comics>) SortFilter.sortAndFilter(characterComics, allQueryParams);
         return characterComics;

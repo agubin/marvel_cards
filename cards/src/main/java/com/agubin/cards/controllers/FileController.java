@@ -41,21 +41,21 @@ public class FileController {
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));
     }
 
-    @PostMapping("comic/{comicid}/cover")
+    @PostMapping("comics/{comicid}/cover")
     public ResponseEntity<?> uploadComicCover(@PathVariable(value = "comicid") Long comicId,
                                          @RequestParam MultipartFile file) {
         fileService.writeDownFile(file, ResourceTypes.COM_IMG, comicId);
         return ResponseEntity.created(LinkManager.getCharacterPortraitURI(comicId)).build();
     }
 
-    @PutMapping("comic/{comicid}/cover")
+    @PutMapping("comics/{comicid}/cover")
     public ResponseEntity<?> updateComicCover(@PathVariable(value = "comicid") Long comicId,
                                          @RequestParam MultipartFile file) {
         fileService.updateFile(file, ResourceTypes.COM_IMG, comicId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("comic/{comicid}/cover")
+    @GetMapping("comics/{comicid}/cover")
     public ResponseEntity<?> sendComicCover(@PathVariable(value = "comicid") Long comicId) {
         byte[] bImage = fileService.getFileById(ResourceTypes.COM_IMG, comicId);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));

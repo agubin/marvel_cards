@@ -24,12 +24,14 @@ public class ComicsCollectionResRepr {
     }
 
     public ComicsCollectionResRepr(List<Comics> comicsList, Long characterId) {
-        this.numberOfComics = comicsList.size();
-        this.comics = comicsList.stream().map(ComicShortView::new).collect(Collectors.toList());
-        this.relatedURI = new HashMap<>();
-        this.relatedURI.put("allComicsURI", LinkManager.getAllComicsURI());
-        this.relatedURI.put("allCharactersURI", LinkManager.getAllCharactersURI());
+        this(comicsList);
+//        this.numberOfComics = comicsList.size();
+//        this.comics = comicsList.stream().map(ComicShortView::new).collect(Collectors.toList());
+//        this.relatedURI = new HashMap<>();
+//        this.relatedURI.put("allComicsURI", LinkManager.getAllComicsURI());
+//        this.relatedURI.put("allCharactersURI", LinkManager.getAllCharactersURI());
         this.relatedURI.put("TheCharacterComicsURI", LinkManager.getCharacterComicsURI(characterId));
+        this.relatedURI.put("TheCharacterURI", LinkManager.getCharacterURI(characterId));
     }
 
     public int getNumberOfComics() {

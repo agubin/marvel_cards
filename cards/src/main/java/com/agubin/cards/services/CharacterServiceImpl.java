@@ -51,14 +51,16 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private void checkCharacterEntity(Character character) throws InvalidEntityException {
-        StringBuffer errorMessage = new StringBuffer();
+        StringBuilder errorMessage = new StringBuilder();
         if (character.getName() == null) {
             errorMessage.append("Name field is required!");
         }
         if (character.getDescription() == null) {
             errorMessage.append("Description field is required!");
         }
-        throw new InvalidEntityException(errorMessage.toString());
+        if (!errorMessage.toString().isEmpty()) {
+            throw new InvalidEntityException(errorMessage.toString());
+        }
     }
 
     @Override
@@ -69,7 +71,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Override
     public Character updateCharacter(Long characterId, Character character) throws ResourceNotFoundException {
-        Optional<Character> characterObj = characterRepository.findById(character.getId());
+        Optional<Character> characterObj = characterRepository.findById(characterId);
         if (!characterObj.isPresent()) {
             throw new ResourceNotFoundException(ResourceTypes.CHR, characterId);
         }

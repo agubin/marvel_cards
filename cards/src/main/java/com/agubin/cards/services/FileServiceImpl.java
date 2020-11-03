@@ -21,7 +21,6 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public boolean checkFileExist(String resType, Long id) {
-        System.out.println(getFullResourcePath(resType, id));
         return new File(getFullResourcePath(resType, id)).exists();
     }
 
@@ -81,13 +80,9 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private boolean characterPortraitExist(String resType, Long resourceId) {
-        return checkFileExist(resType, resourceId);
-    }
-
     @Override
     public void writeDownFile(MultipartFile file, String resType, Long resourceId) {
-        if (characterPortraitExist(resType, resourceId)) {
+        if (checkFileExist(resType, resourceId)) {
             throw new ResourceAlreadyExistsException(resType, resourceId);
         }
         writeFile(file, resType, resourceId);
@@ -95,7 +90,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void updateFile(MultipartFile file, String resType, Long resourceId) {
-        if (!characterPortraitExist(resType, resourceId)) {
+        if (!checkFileExist(resType, resourceId)) {
             throw new ResourceNotFoundException(resType, resourceId);
         }
         writeFile(file, resType, resourceId);
@@ -103,7 +98,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public byte[] getFileById(String resType, Long resourceId) {
-        if (!characterPortraitExist(resType, resourceId)) {
+        if (!checkFileExist(resType, resourceId)) {
             throw new ResourceNotFoundException(resType, resourceId);
         }
         byte[] bImage;

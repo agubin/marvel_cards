@@ -44,14 +44,16 @@ public class ComicServiceImpl implements ComicService {
     }
 
     private void checkComicEntity(Comics comic) throws InvalidEntityException {
-        StringBuffer errorMessage = new StringBuffer();
+        StringBuilder errorMessage = new StringBuilder("");
         if (comic.getTitle() == null) {
             errorMessage.append("Title field is required!");
         }
         if (comic.getDescription() == null) {
             errorMessage.append("Description field is required!");
         }
-        throw new InvalidEntityException(errorMessage.toString());
+        if (!errorMessage.toString().isEmpty()) {
+            throw new InvalidEntityException(errorMessage.toString());
+        }
     }
 
     @Override

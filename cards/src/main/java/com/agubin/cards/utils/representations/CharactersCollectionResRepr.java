@@ -24,12 +24,14 @@ public class CharactersCollectionResRepr {
     }
 
     public CharactersCollectionResRepr(List<Character> characterList, Long comicId) {
-        this.numberOfCharacters = characterList.size();
-        this.characters = characterList.stream().map(CharacterShortView::new).collect(Collectors.toList());
-        this.relatedURI = new HashMap<>();
-        this.relatedURI.put("allCharactersURI", LinkManager.getAllCharactersURI());
-        this.relatedURI.put("allComicsURI", LinkManager.getAllComicsURI());
+        this(characterList);
+//        this.numberOfCharacters = characterList.size();
+//        this.characters = characterList.stream().map(CharacterShortView::new).collect(Collectors.toList());
+//        this.relatedURI = new HashMap<>();
+//        this.relatedURI.put("allCharactersURI", LinkManager.getAllCharactersURI());
+//        this.relatedURI.put("allComicsURI", LinkManager.getAllComicsURI());
         this.relatedURI.put("TheComicCharactersURI", LinkManager.getComicCharactersURI(comicId));
+        this.relatedURI.put("TheComicURI", LinkManager.getComicURI(comicId));
     }
 
     public int getNumberOfCharacters() {

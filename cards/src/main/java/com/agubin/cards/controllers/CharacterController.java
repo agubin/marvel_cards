@@ -42,7 +42,7 @@ public class CharacterController {
     }
 
     @PutMapping("/characters/{characterid}")
-    public ResponseEntity<?> updateCharacter(@PathVariable(value = "characterId") Long characterId, @RequestBody Character character) {
+    public ResponseEntity<?> updateCharacter(@PathVariable(value = "characterid") Long characterId, @RequestBody Character character) {
         Character updatedCharacter = characterService.updateCharacter(characterId, character);
         List<Comics> comics = comicService.getCharacterComics(updatedCharacter.getId(), new HashMap<>());
         return new ResponseEntity<>(new PersonalCharacterResRepr(updatedCharacter, comics), HttpStatus.CREATED);
