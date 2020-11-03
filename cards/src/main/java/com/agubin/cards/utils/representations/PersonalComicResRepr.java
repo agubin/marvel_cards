@@ -3,8 +3,7 @@ package com.agubin.cards.utils.representations;
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
 import com.agubin.cards.utils.LinkManager;
-import com.agubin.cards.utils.representations.CharacterShortView;
-import com.agubin.cards.utils.representations.CharactersCollectionResRepr;
+
 
 import java.net.URI;
 import java.util.HashMap;

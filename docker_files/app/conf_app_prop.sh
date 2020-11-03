@@ -15,30 +15,17 @@ item1="spring.jpa.hibernate.ddl-auto"
 reg1="$item1=.*"
 sub1="$item1=none"
 
-# driver="postgresql"
-# host="db"
-# port="5432"
-# db_name="postgres"
-
 item2="spring.datasource.url"
 reg2="$item2=jdbc:[a-z]*:\/\/[a-z]*:[0-9]*\/[a-z]*"
 sub2="$item2=jdbc:$driver:\/\/$db_host:$db_port\/$db_name"
-
-# db_user="postgres"
 
 item3="spring.datasource.username"
 reg3="$item3=.*"
 sub3="$item3=$db_user"
 
-# db_pswd="12345"
-
 item4="spring.datasource.password"
 reg4="$item4=.*"
 sub4="$item4=$db_pswd"
-
-# schema="https"
-# host="localhost"
-# port="8080"
 
 item5="schema"
 reg5="$item5=.*"

@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+//Handle requests related to comics
 @Controller
 public class ComicController {
 

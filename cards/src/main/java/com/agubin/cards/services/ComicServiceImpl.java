@@ -3,6 +3,7 @@ package com.agubin.cards.services;
 
 import com.agubin.cards.exceptions.InvalidEntityException;
 import com.agubin.cards.exceptions.ResourceNotFoundException;
+import com.agubin.cards.models.Character;
 import com.agubin.cards.utils.ResourceTypes;
 import com.agubin.cards.exceptions.UnexpectedBehaviourException;
 import com.agubin.cards.models.CharacterComics;

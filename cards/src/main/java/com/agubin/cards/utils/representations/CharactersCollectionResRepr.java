@@ -32,14 +32,6 @@ public class CharactersCollectionResRepr {
         this.relatedURI.put("TheComicCharactersURI", LinkManager.getComicCharactersURI(comicId));
     }
 
-//    public String getAllCharactersLink() {
-//        return allCharactersLink;
-//    }
-
-//    public String getSelfLink() {
-//        return selfLink;
-//    }
-
     public int getNumberOfCharacters() {
         return numberOfCharacters;
     }

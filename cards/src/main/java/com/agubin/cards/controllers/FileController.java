@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 
+//Handle requests related to files
 @RestController
 public class FileController {
 

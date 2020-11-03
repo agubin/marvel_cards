@@ -53,7 +53,6 @@ public class FileServiceImpl implements FileService {
         return fileStorage + getResourcePath(resType);
     }
 
-//    @Override
     private void storeFile(MultipartFile file, String resType, Long id) throws IOException {
         File resDirFile = new File(getFullResourceDirPath(resType));
         if (!resDirFile.exists() && !resDirFile.mkdirs()) {
@@ -66,7 +65,6 @@ public class FileServiceImpl implements FileService {
         bous.close();
     }
 
-//    @Override
     private byte[] retrieveFile(String resType, Long id) throws IOException {
         return Files.readAllBytes(Paths.get(getFullResourcePath(resType, id)));
     }

@@ -6,10 +6,6 @@ public interface FileService {
 
     boolean checkFileExist(String resType, Long id);
 
-//    void storeFile(MultipartFile file, String resType, Long id) throws IOException;
-
-//    byte[] retrieveFile(String resType, Long id) throws IOException;
-
     void writeDownFile(MultipartFile file, String resType, Long characterId);
 
     byte[] getFileById(String resType, Long characterId);

@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 public class ComicsCollectionResRepr {
 
-//    private String allComicsLink;
-//    private String selfLink;
     private int numberOfComics;
     private List<ComicShortView> comics;
     private Map<String, URI> relatedURI;
@@ -33,22 +31,6 @@ public class ComicsCollectionResRepr {
         this.relatedURI.put("allCharactersURI", LinkManager.getAllCharactersURI());
         this.relatedURI.put("TheCharacterComicsURI", LinkManager.getCharacterComicsURI(characterId));
     }
-
-//    public ComicsCollectionResRepr init(List<Comics> comicsList) {
-//        this.allComicsLink = LinkManager.getAllComicsLink();
-//        this.selfLink = "";
-//        this.numberOfComics = comicsList.size();
-//        this.collectionComics = comicsList.stream().map(ComicShortView::new).collect(Collectors.toList());
-//        return this;
-//    }
-
-//    public String getAllComicsLink() {
-//        return allComicsLink;
-//    }
-
-//    public String getSelfLink() {
-//        return selfLink;
-//    }
 
     public int getNumberOfComics() {
         return numberOfComics;

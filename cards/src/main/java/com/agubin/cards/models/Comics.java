@@ -5,6 +5,7 @@ import com.agubin.cards.utils.Orderly;
 
 import javax.persistence.*;
 import java.util.Comparator;
+import java.util.List;
 
 @Entity
 @Table (name = "comics")
@@ -62,11 +63,6 @@ public class Comics implements Orderly {
     }
 
     @Override
-    public Comparator<com.agubin.cards.models.Comics> getComparatorFor(String condition) {
-        return getComparator(condition);
-    }
-
-    @Override
     public String nameLikeValue() {
         return getTitle();
     }
@@ -74,20 +70,5 @@ public class Comics implements Orderly {
     @Override
     public Long idLikeValue() {
         return getId();
-    }
-
-    public static Comparator<Comics> getComparator(String condition) {
-        switch (condition) {
-            case "title":
-                return (o1, o2) -> o1.getTitle().compareTo(o2.getTitle());
-            case "-title":
-                return (o1, o2) -> o2.getTitle().compareTo(o1.getTitle());
-            case "id":
-                return (o1, o2) -> o1.getId().compareTo(o2.getId());
-            case "-id":
-                return (o1, o2) -> o2.getId().compareTo(o1.getId());
-            default:
-                return (o1, o2) -> 0;
-        }
     }
 }

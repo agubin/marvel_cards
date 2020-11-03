@@ -14,7 +14,6 @@ public class PersonalCharacterResRepr {
     private Character character;
     private int numberOfRelatedComics;
     private List<ComicShortView> relatedComics;
-//    private ComicsCollectionResRepr characterComics;
     private Map<String, URI> relatedURI;
 
     public PersonalCharacterResRepr(Character character, List<Comics> comics) {
@@ -31,10 +30,6 @@ public class PersonalCharacterResRepr {
     public Character getCharacter() {
         return character;
     }
-
-//    public ComicsCollectionResRepr getCharacterComics() {
-//        return characterComics;
-//    }
 
     public int getNumberOfRelatedComics() {
         return numberOfRelatedComics;

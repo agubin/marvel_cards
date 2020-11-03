@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+//Handle requests related to comics and characters bonds
 @RestController
 public class CharacterComicController {
 

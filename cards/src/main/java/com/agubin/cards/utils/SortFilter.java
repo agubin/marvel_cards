@@ -30,7 +30,7 @@ public class SortFilter {
 
     private static void order(List<? extends Orderly> orderly, String condition) {
         if (!condition.isEmpty()) {
-            orderly.sort(orderly.get(0).getComparatorFor(condition));
+            orderly.sort(Orderly.getComparator(condition));
         }
     }
 }
