@@ -1,12 +1,38 @@
 package com.agubin.cards.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
 import java.net.URI;
 
+@Component
+@PropertySource("classpath:application.properties")
 public class LinkManager {
 
-    private static String schema = "https";
-    private static String host = "localhost";
-    private static String port = "8080";
+    @Autowired
+    private Environment env;
+
+    @Autowired
+    private void setSchema() {
+        LinkManager.schema = env.getProperty("schema");
+    }
+
+    @Autowired
+    private  void setHost() {
+        LinkManager.host = env.getProperty("host");
+    }
+
+    @Autowired
+    private  void setPort() {
+        LinkManager.port = env.getProperty("server.port");
+    }
+
+
+    private static String schema;
+    private static String host;
+    private static String port;
 
     private static String charactersResource = "characters";
     private static String comicsResource = "comics";

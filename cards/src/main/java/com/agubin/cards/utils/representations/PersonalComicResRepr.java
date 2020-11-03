@@ -1,7 +1,10 @@
-package com.agubin.cards.utils;
+package com.agubin.cards.utils.representations;
 
 import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
+import com.agubin.cards.utils.LinkManager;
+import com.agubin.cards.utils.representations.CharacterShortView;
+import com.agubin.cards.utils.representations.CharactersCollectionResRepr;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -13,7 +16,6 @@ public class PersonalComicResRepr {
     private Comics comic;
     private int numberOfRelatedCharacters;
     private List<CharacterShortView> relatedCharacters;
-//    private CharactersCollectionResRepr comicCharacters;
     private Map<String, URI> relatedURI;
 
     public PersonalComicResRepr(Comics comic, List<Character> characterList) {
@@ -31,10 +33,6 @@ public class PersonalComicResRepr {
     public Comics getComic() {
         return comic;
     }
-
-//    public CharactersCollectionResRepr getComicCharacters() {
-//        return comicCharacters;
-//    }
 
     public int getNumberOfRelatedCharacters() {
         return numberOfRelatedCharacters;

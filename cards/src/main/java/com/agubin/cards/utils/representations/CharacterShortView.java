@@ -1,6 +1,7 @@
-package com.agubin.cards.utils;
+package com.agubin.cards.utils.representations;
 
 import com.agubin.cards.models.Character;
+import com.agubin.cards.utils.LinkManager;
 
 import java.net.URI;
 

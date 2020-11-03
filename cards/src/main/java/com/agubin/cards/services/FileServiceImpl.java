@@ -1,6 +1,7 @@
 package com.agubin.cards.services;
 
 import com.agubin.cards.exceptions.*;
+import com.agubin.cards.utils.ResourceTypes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

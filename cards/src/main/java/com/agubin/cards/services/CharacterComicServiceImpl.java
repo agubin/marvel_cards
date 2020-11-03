@@ -7,6 +7,7 @@ import com.agubin.cards.models.Comics;
 import com.agubin.cards.repo.CharacterComicsRepository;
 import com.agubin.cards.repo.CharacterRepository;
 import com.agubin.cards.repo.ComicsRepository;
+import com.agubin.cards.utils.ResourceTypes;
 import com.agubin.cards.utils.SortFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;

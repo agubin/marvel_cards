@@ -1,6 +1,7 @@
 package com.agubin.cards.exceptions;
 
 import com.agubin.cards.utils.LinkManager;
+import com.agubin.cards.utils.ResourceTypes;
 
 import java.net.URI;
 

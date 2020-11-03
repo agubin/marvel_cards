@@ -1,6 +1,6 @@
 package com.agubin.cards.controllers;
 
-import com.agubin.cards.exceptions.ApiError;
+import com.agubin.cards.exceptions.ExceptionData;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                      HttpStatus status,
                                                                      WebRequest request) {
 
-        ApiError apiError = new ApiError(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getLocalizedMessage());
+        ExceptionData apiError = new ExceptionData(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getLocalizedMessage());
         return new ResponseEntity<Object>(apiError.getMessage(), apiError.getStatus());
     }
 
@@ -30,7 +30,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                       WebRequest request) {
 
         String errorMessage = "The resource(" + request.getDescription(false) + ") is provided only in JSON format!";
-        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE, errorMessage);
+        ExceptionData apiError = new ExceptionData(HttpStatus.NOT_ACCEPTABLE, errorMessage);
         return new ResponseEntity<Object>(apiError.getMessage(), apiError.getStatus());
     }
 

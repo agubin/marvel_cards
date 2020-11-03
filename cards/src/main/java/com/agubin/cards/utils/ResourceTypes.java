@@ -1,4 +1,4 @@
-package com.agubin.cards.exceptions;
+package com.agubin.cards.utils;
 
 public interface ResourceTypes {
 

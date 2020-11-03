@@ -4,18 +4,14 @@ import com.agubin.cards.models.Character;
 import com.agubin.cards.models.Comics;
 import com.agubin.cards.services.CharacterService;
 import com.agubin.cards.services.ComicService;
-import com.agubin.cards.utils.CharactersCollectionResRepr;
+import com.agubin.cards.utils.representations.CharactersCollectionResRepr;
 import com.agubin.cards.utils.LinkManager;
-import com.agubin.cards.utils.PersonalCharacterResRepr;
+import com.agubin.cards.utils.representations.PersonalCharacterResRepr;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,24 +59,4 @@ public class CharacterController {
         characterService.deleteCharacter(characterId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-//    @PostMapping("characters/{characterid}/portrait")
-//    public ResponseEntity<?> uploadImage(@PathVariable(value = "characterid") Long characterId,
-//                                         @RequestParam MultipartFile file) {
-//        characterService.writeDownFile(file, characterId);
-//        return ResponseEntity.created(LinkManager.getCharacterPortraitURI(characterId)).build();
-//    }
-//
-//    @PutMapping("characters/{characterid}/portrait")
-//    public ResponseEntity<?> updateImage(@PathVariable(value = "characterid") Long characterId,
-//                                         @RequestParam MultipartFile file) {
-//        characterService.updateFile(file, characterId);
-//        return new ResponseEntity<>(HttpStatus.CREATED);
-//    }
-//
-//    @GetMapping("/characters/{characterid}/portrait")
-//    public ResponseEntity<?> sendImage(@PathVariable(value = "characterid") Long characterId) {
-//        byte[] bImage = characterService.getFileById(characterId);
-//        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));
-//    }
 }

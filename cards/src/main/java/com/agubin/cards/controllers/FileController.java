@@ -1,6 +1,6 @@
 package com.agubin.cards.controllers;
 
-import com.agubin.cards.exceptions.ResourceTypes;
+import com.agubin.cards.utils.ResourceTypes;
 import com.agubin.cards.services.FileService;
 import com.agubin.cards.utils.LinkManager;
 import org.springframework.beans.factory.annotation.Autowired;

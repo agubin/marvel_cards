@@ -5,14 +5,11 @@ import com.agubin.cards.models.Character;
 import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.repo.CharacterComicsRepository;
 import com.agubin.cards.repo.CharacterRepository;
-import com.agubin.cards.utils.FileHandler;
-import com.agubin.cards.utils.FileHandlerImpl;
+import com.agubin.cards.utils.ResourceTypes;
 import com.agubin.cards.utils.SortFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +22,6 @@ public class CharacterServiceImpl implements CharacterService {
     private CharacterRepository characterRepository;
     @Autowired
     private CharacterComicsRepository characterComicsRepository;
-    @Autowired
-    private FileHandler fileHandler;
 
 
     @Override
@@ -108,59 +103,5 @@ public class CharacterServiceImpl implements CharacterService {
         }
         comicsCharacters = (List<Character>) SortFilter.sortAndFilter(comicsCharacters, allQueryParams);
         return comicsCharacters;
-    }
-
-
-    private void writeFile(MultipartFile file, Long characterId) {
-        if (file.isEmpty()) {
-            throw new InvalidDataException(DataCorruptionTypes.EMPTY_FILE);
-        }
-        try {
-//            FileHandlerImpl.storeFile(file, ResourceTypes.CHR_IMG, characterId);
-            fileHandler.storeFile(file, ResourceTypes.CHR_IMG, characterId);
-        } catch (IOException ex) {
-            System.out.println(ex);
-            throw new UnexpectedBehaviourException();
-        }
-    }
-
-    private boolean characterPortraitExist(Long characterId) {
-//        return FileHandlerImpl.checkFileExist(ResourceTypes.CHR_IMG, characterId);
-        return fileHandler.checkFileExist(ResourceTypes.CHR_IMG, characterId);
-    }
-
-    @Override
-    public void writeDownFile(MultipartFile file, Long characterId) {
-        if (characterPortraitExist(characterId)) {
-            throw new ResourceAlreadyExistsException(ResourceTypes.CHR_IMG, characterId);
-        }
-        writeFile(file, characterId);
-    }
-
-    @Override
-    public void updateFile(MultipartFile file, Long characterId) {
-        if (!characterPortraitExist(characterId)) {
-            throw new ResourceNotFoundException(ResourceTypes.CHR_IMG, characterId);
-        }
-        writeFile(file, characterId);
-    }
-
-    @Override
-    public byte[] getFileById(Long characterId) {
-        if (!characterPortraitExist(characterId)) {
-            throw new ResourceNotFoundException(ResourceTypes.CHR_IMG, characterId);
-        }
-        byte[] bImage;
-        try {
-//            bImage = FileHandlerImpl.retrieveFile(ResourceTypes.CHR_IMG, characterId);
-            bImage = fileHandler.retrieveFile(ResourceTypes.CHR_IMG, characterId);
-        } catch (IOException ex) {
-            System.out.println(ex);
-            throw new UnexpectedBehaviourException();
-        }
-        if (bImage.length == 0) {
-            throw new UnexpectedBehaviourException();
-        }
-        return bImage;
     }
 }
