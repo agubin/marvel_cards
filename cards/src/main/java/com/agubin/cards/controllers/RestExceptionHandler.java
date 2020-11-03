@@ -19,8 +19,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                      HttpStatus status,
                                                                      WebRequest request) {
 
-        ExceptionData apiError = new ExceptionData(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getLocalizedMessage());
-        return new ResponseEntity<Object>(apiError.getMessage(), apiError.getStatus());
+        ExceptionData exceptionData = new ExceptionData(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getLocalizedMessage());
+        return new ResponseEntity<Object>(exceptionData.getMessage(), exceptionData.getStatus());
     }
 
     @Override
@@ -30,8 +30,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                                                       WebRequest request) {
 
         String errorMessage = "The resource(" + request.getDescription(false) + ") is provided only in JSON format!";
-        ExceptionData apiError = new ExceptionData(HttpStatus.NOT_ACCEPTABLE, errorMessage);
-        return new ResponseEntity<Object>(apiError.getMessage(), apiError.getStatus());
+        ExceptionData exceptionData = new ExceptionData(HttpStatus.NOT_ACCEPTABLE, errorMessage);
+        return new ResponseEntity<Object>(exceptionData.getMessage(), exceptionData.getStatus());
     }
 
     @Override

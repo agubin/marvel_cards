@@ -14,6 +14,6 @@ services:
     build: ./app
     container_name: j_app
     ports:
-      - 8080:8080
+      - 8081:8080
     # volumes:
     #   - path/to/volume:/home/fileStorage

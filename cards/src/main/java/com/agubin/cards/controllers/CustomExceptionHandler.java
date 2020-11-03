@@ -11,7 +11,10 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(value = {ResourceNotFoundException.class,
                                NonExistingCharacterException.class,
-                               InvalidEntityException.class})
+                               InvalidEntityException.class,
+                               ResourceAlreadyExistsException.class,
+                               UnexpectedBehaviourException.class,
+                               InvalidDataException.class})
     public ResponseEntity<Object> handleCustomException(CustomException ex) {
 
         HttpStatus status;

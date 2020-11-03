@@ -50,6 +50,7 @@ public class CharacterController {
 
     @GetMapping("/characters/{characterid}")
     public ResponseEntity<PersonalCharacterResRepr> getCharacter(@PathVariable(value = "characterid") Long characterId) {
+        System.out.println("into getMapping");
         Character character = characterService.getCharacterById(characterId);
         List<Comics> comics = comicService.getCharacterComics(characterId, new HashMap<>());
         return new ResponseEntity<>(new PersonalCharacterResRepr(character, comics), HttpStatus.OK);

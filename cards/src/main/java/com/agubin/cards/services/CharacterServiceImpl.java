@@ -82,7 +82,7 @@ public class CharacterServiceImpl implements CharacterService {
         if (character.getDescription() != null) {
             updatedCharacter.setDescription(character.getDescription());
         }
-        return saveCharacterEntity(character);
+        return saveCharacterEntity(updatedCharacter);
     }
 
     @Override

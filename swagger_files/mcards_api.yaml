@@ -3,7 +3,7 @@ info:
   description: "This is a MARVEL cards API."
   version: "1.0.0"
   title: "MARVEL cards"
-host: "localhost:8081"
+host: "localhost:8080"
 tags:
 - name: "characters"
   description: "Characters info"
