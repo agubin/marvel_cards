@@ -1,0 +1,635 @@
+swagger: "2.0"
+info:
+  description: "This is a MARVEL cards API."
+  version: "1.0.0"
+  title: "MARVEL cards"
+host: "localhost:8081"
+tags:
+- name: "characters"
+  description: "Characters info"
+- name: "comics"
+  description: "Comics info"
+schemes:
+- "https"
+- "http"
+paths:
+  /characters:
+    get:
+      tags:
+        - characters
+      summary: List of all characters
+      parameters:
+        - $ref: "#/parameters/orderByParam"
+        - $ref: "#/parameters/nameContainsParam"
+      produces:
+        - application/json
+        - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ShortCharacterDataList'
+        "406":
+          $ref: "#/responses/406-NotAcceptable"
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    post:
+      tags:
+        - characters
+      summary: Add a new character
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ConsumedCharacterData"
+          description: Character's params
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/FullCharacterData'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+        "422":
+          $ref: '#/responses/422-UnprocessableEntity'
+  /characters/{characterid}:
+    parameters:
+        - in: path
+          name: characterid
+          required: true
+          type: integer
+          description: Character ID
+    get:
+      tags:
+        - characters
+      summary: Character detailed info
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FullCharacterData'
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+    put:
+      tags:
+        - characters
+      summary: Update character info
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ConsumedCharacterData'
+          description: Character's params
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/FullCharacterData'
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+    delete:
+      tags:
+        - characters
+      summary: Delete character
+      responses:
+        "200":
+          description: OK
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+  /characters/{characterid}/portrait:
+    parameters:
+        - in: path
+          name: characterid
+          required: true
+          type: integer
+          description: Character ID
+    get:
+      tags:
+        - characters
+      summary: Character's portrait
+      produces:
+        - Image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    post:
+      tags:
+        - characters
+      summary: Add character's portrait
+      parameters:
+        - in: formData
+          name: data
+          required: true
+          type:  file
+          description: Image of the character's portreit
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Created
+        "400":
+          $ref: '#/responses/400-BadRequest'
+        "409":
+          $ref: '#/responses/409-Conflict'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    put:
+      tags:
+        - characters
+      summary: Update character's portrait
+      parameters:
+        - in: formData
+          name: data
+          required: true
+          type:  file
+          description: Image of the character's portreit
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Created
+        "400":
+          $ref: '#/responses/400-BadRequest'
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+  /characters/{characterid}/comics:
+    parameters:
+        - in: path
+          name: characterid
+          required: true
+          type: integer
+          description: character ID
+    get:
+      tags:
+        - characters
+      summary: List of all comics with character
+      parameters:
+        - $ref: "#/parameters/orderByParam"
+        - $ref: "#/parameters/nameContainsParam"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/ShortComicDataList"
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    post:
+      tags:
+        - characters
+      summary: Add comic IDs which character is related to
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Created
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "409":
+          $ref: '#/responses/409-Conflict'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+  /characters/{characterid}/comics/{comicid}:
+    delete:
+      tags:
+        - characters
+      summary: Delete comic and character relation
+      parameters:
+        - in: path
+          name: characterid
+          required: true
+          type: integer
+          description: character ID
+        - in: path
+          name: comicid
+          required: true
+          type: integer
+          description: comic ID
+      responses:
+        "200":
+          description: OK
+        "404":
+          $ref: '#/responses/404-NotFound'
+  /comics:
+    get:
+      tags:
+        - comics
+      summary: List of all comics
+      parameters:
+        - $ref: "#/parameters/orderByParam"
+        - $ref: "#/parameters/nameContainsParam"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/ShortComicDataList"
+        "406":
+          $ref: "#/responses/406-NotAcceptable"
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    post:
+      tags:
+        - comics
+      summary: Add a new comic
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ConsumedComicData"
+          description: Comic's params
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/FullComicData'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+        "422":
+          $ref: '#/responses/422-UnprocessableEntity'
+  /comics/{comicsid}:
+    parameters:
+        - in: path
+          name: comicsid
+          required: true
+          type: integer
+          description: Comic ID
+    get:
+      tags:
+        - comics
+      summary: Comic detailed info
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/FullComicData'
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+    put:
+      tags:
+        - comics
+      summary: Update comic info
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/ConsumedComicData"
+          description: Comic's params
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/FullComicData'
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+    delete:
+      tags:
+        - comics
+      summary: Delete comic
+      responses:
+        "200":
+          description: OK
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+  /comics/{comicid}/cover:
+    parameters:
+        - in: path
+          name: comicid
+          required: true
+          type: integer
+          description: Comic ID
+    get:
+      tags:
+        - comics
+      summary: Comic's cover
+      produces:
+        - Image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    post:
+      tags:
+        - comics
+      summary: Add comic's cover
+      parameters:
+        - in: formData
+          name: data
+          required: true
+          type:  file
+          description: Image of the comic's cover
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Created
+        "400":
+          $ref: '#/responses/400-BadRequest'
+        "409":
+          $ref: '#/responses/409-Conflict'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    put:
+      tags:
+        - comics
+      summary: Update comic's cover
+      parameters:
+        - in: formData
+          name: data
+          required: true
+          type:  file
+          description: Image of the comic's cover
+      consumes:
+        - multipart/form-data
+      responses:
+        "201":
+          description: Created
+        "400":
+          $ref: '#/responses/400-BadRequest'
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+  /comics/{comicsid}/characters:
+    parameters:
+        - in: path
+          name: comicsid
+          required: true
+          type: integer
+          description: comic ID
+    get:
+      tags:
+        - comics
+      summary: List of the comic's characters
+      parameters:
+        - $ref: "#/parameters/orderByParam"
+        - $ref: "#/parameters/nameContainsParam"
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/ShortComicDataList"
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "406":
+          $ref: '#/responses/406-NotAcceptable'
+        "500":
+          $ref: '#/responses/500-InternalServerError'
+    post:
+      tags:
+        - comics
+      summary: Add character IDs which are related to the comic
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+      consumes:
+        - application/json
+      responses:
+        "201":
+          description: Created
+        "404":
+          $ref: '#/responses/404-NotFound'
+        "409":
+          $ref: '#/responses/409-Conflict'
+        "415":
+          $ref: '#/responses/415-UnsupportedMediaType'
+  /comics/{comicsid}/characters/{characterid}:
+    delete:
+      tags:
+        - comics
+      summary: Delete comic and character relation
+      parameters:
+        - in: path
+          name: comicsid
+          required: true
+          type: integer
+          description: comic ID
+        - in: path
+          name: characterid
+          required: true
+          type: integer
+          description: character ID
+      responses:
+        "200":
+          description: OK
+        "404":
+          $ref: '#/responses/404-NotFound'
+parameters:
+  orderByParam:
+    in: query
+    name: orderBy
+    required: false
+    type: string
+    enum: [name, -name, id, -id]
+    description: Ordering rule
+  nameContainsParam:
+    in: query
+    name: nameContains
+    required: false
+    type: string
+    description: string pattern what the name must contains
+definitions:
+  Character:
+    description: Representation character entity in database.
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+    required:
+      - name
+      - description
+  Comic:
+    description: Representation comic entity in database.
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      description:
+        type: string
+      creators:
+        type: string
+    required:
+      - title
+      - description
+      - creators
+  ConsumedCharacterData:
+    description: The data form that is required to be sent to create a character.
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+    required:
+      - name
+      - description
+  ConsumedComicData:
+    description: The data form that is required to be sent to create a comic.
+    type: object
+    properties:
+      title:
+        type: string
+      description:
+        type: string
+      creators:
+        type: string
+    required:
+      - title
+      - description
+  ShortCharacterData:
+    description: Short representation of the character.
+    type: object
+    properties:
+      name:
+        type: string
+      URI:
+        type: string
+  ShortComicData:
+    description: Short representation of the comic.
+    type: object
+    properties:
+      title:
+        type: string
+      URI:
+        type: string
+  FullCharacterData:
+    description: Full representation of the character and related info.
+    type: object
+    properties:
+      character:
+        $ref: '#/definitions/Character'
+      comics:
+        type: array
+        items:
+          $ref: '#/definitions/ShortComicData'
+      relatedURI:
+        type: array
+        items:
+          type: string
+  FullComicData:
+    description: Full representation of the comic and related info.
+    type: object
+    properties:
+      comic:
+        $ref: '#/definitions/Comic'
+      characters:
+        type: array
+        items:
+          $ref: '#/definitions/ShortCharacterData'
+      relatedURI:
+        type: array
+        items:
+          type: string
+  ShortCharacterDataList:
+    description: List of short representations of characters.
+    type: array
+    items:
+      $ref: '#/definitions/ShortCharacterData'
+  ShortComicDataList:
+    description: List of short representations of comics.
+    type: array
+    items:
+      $ref: '#/definitions/ShortComicData'
+responses:
+  400-BadRequest:
+    description: Bad Request
+  404-NotFound:
+    description: Not Found
+  406-NotAcceptable:
+    description: Not Acceptable
+  409-Conflict:
+    description: Conflict
+  415-UnsupportedMediaType:
+    description: Unsupported Media Type
+  422-UnprocessableEntity:
+    description: Unprocessable Entity
+  500-InternalServerError:
+    description: Internal Server Error
