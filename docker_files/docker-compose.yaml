@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+
+  database:
+    build: ./db
+    container_name: db
+    restart: always
+
+
+  java_app:
+    build: ./app
+    container_name: j_app
+    ports:
+      - 8081:8080

@@ -56,7 +56,7 @@ public class FileServiceImpl implements FileService {
 //    @Override
     private void storeFile(MultipartFile file, String resType, Long id) throws IOException {
         File resDirFile = new File(getFullResourceDirPath(resType));
-        if (!resDirFile.exists() && !resDirFile.mkdir()) {
+        if (!resDirFile.exists() && !resDirFile.mkdirs()) {
             System.out.println("Creating directory on path: " + resDirFile.getAbsolutePath() + " failed!");
             throw new UnexpectedBehaviourException();
         }

@@ -1,0 +1,4 @@
+FROM agubin/cards_db
+
+ENV PGDATA=/home/data
+ENV POSTGRES_PASSWORD=12345
