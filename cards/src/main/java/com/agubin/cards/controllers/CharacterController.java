@@ -29,7 +29,6 @@ public class CharacterController {
     private ComicService comicService;
 
 
-    //Реализовать оптимизированную выборку из БД
     @GetMapping("/characters")
     public ResponseEntity<CharactersCollectionResRepr> getCharacters(@RequestParam Map<String, String> allQueryParams) {
         List<Character> characters = characterService.getCharacters(allQueryParams);
@@ -65,23 +64,23 @@ public class CharacterController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("characters/{characterid}/portrait")
-    public ResponseEntity<?> uploadImage(@PathVariable(value = "characterid") Long characterId,
-                                         @RequestParam MultipartFile file) {
-        characterService.writeDownFile(file, characterId);
-        return ResponseEntity.created(LinkManager.getCharacterPortraitURI(characterId)).build();
-    }
-
-    @PutMapping("characters/{characterid}/portrait")
-    public ResponseEntity<?> updateImage(@PathVariable(value = "characterid") Long characterId,
-                                         @RequestParam MultipartFile file) {
-        characterService.updateFile(file, characterId);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @GetMapping("/characters/{characterid}/portrait")
-    public ResponseEntity<?> sendImage(@PathVariable(value = "characterid") Long characterId) {
-        byte[] bImage = characterService.getImageById(characterId);
-        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));
-    }
+//    @PostMapping("characters/{characterid}/portrait")
+//    public ResponseEntity<?> uploadImage(@PathVariable(value = "characterid") Long characterId,
+//                                         @RequestParam MultipartFile file) {
+//        characterService.writeDownFile(file, characterId);
+//        return ResponseEntity.created(LinkManager.getCharacterPortraitURI(characterId)).build();
+//    }
+//
+//    @PutMapping("characters/{characterid}/portrait")
+//    public ResponseEntity<?> updateImage(@PathVariable(value = "characterid") Long characterId,
+//                                         @RequestParam MultipartFile file) {
+//        characterService.updateFile(file, characterId);
+//        return new ResponseEntity<>(HttpStatus.CREATED);
+//    }
+//
+//    @GetMapping("/characters/{characterid}/portrait")
+//    public ResponseEntity<?> sendImage(@PathVariable(value = "characterid") Long characterId) {
+//        byte[] bImage = characterService.getFileById(characterId);
+//        return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).contentLength(bImage.length).body(new InputStreamResource(new ByteArrayInputStream(bImage)));
+//    }
 }

@@ -6,17 +6,13 @@ import com.agubin.cards.models.CharacterComics;
 import com.agubin.cards.repo.CharacterComicsRepository;
 import com.agubin.cards.repo.CharacterRepository;
 import com.agubin.cards.utils.FileHandler;
+import com.agubin.cards.utils.FileHandlerImpl;
 import com.agubin.cards.utils.SortFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +25,8 @@ public class CharacterServiceImpl implements CharacterService {
     private CharacterRepository characterRepository;
     @Autowired
     private CharacterComicsRepository characterComicsRepository;
+    @Autowired
+    private FileHandler fileHandler;
 
 
     @Override
@@ -118,7 +116,8 @@ public class CharacterServiceImpl implements CharacterService {
             throw new InvalidDataException(DataCorruptionTypes.EMPTY_FILE);
         }
         try {
-            FileHandler.storeFile(file, ResourceTypes.CHR_IMG, characterId);
+//            FileHandlerImpl.storeFile(file, ResourceTypes.CHR_IMG, characterId);
+            fileHandler.storeFile(file, ResourceTypes.CHR_IMG, characterId);
         } catch (IOException ex) {
             System.out.println(ex);
             throw new UnexpectedBehaviourException();
@@ -126,7 +125,8 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     private boolean characterPortraitExist(Long characterId) {
-        return FileHandler.checkFileExist(ResourceTypes.CHR_IMG, characterId);
+//        return FileHandlerImpl.checkFileExist(ResourceTypes.CHR_IMG, characterId);
+        return fileHandler.checkFileExist(ResourceTypes.CHR_IMG, characterId);
     }
 
     @Override
@@ -146,13 +146,14 @@ public class CharacterServiceImpl implements CharacterService {
     }
 
     @Override
-    public byte[] getImageById(Long characterId) {
+    public byte[] getFileById(Long characterId) {
         if (!characterPortraitExist(characterId)) {
             throw new ResourceNotFoundException(ResourceTypes.CHR_IMG, characterId);
         }
         byte[] bImage;
         try {
-            bImage = FileHandler.retrieveFile(ResourceTypes.CHR_IMG, characterId);
+//            bImage = FileHandlerImpl.retrieveFile(ResourceTypes.CHR_IMG, characterId);
+            bImage = fileHandler.retrieveFile(ResourceTypes.CHR_IMG, characterId);
         } catch (IOException ex) {
             System.out.println(ex);
             throw new UnexpectedBehaviourException();

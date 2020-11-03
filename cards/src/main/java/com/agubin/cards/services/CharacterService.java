@@ -22,7 +22,7 @@ public interface CharacterService {
 
     void writeDownFile(MultipartFile file, Long characterId);
 
-    byte[] getImageById(Long characterId);
+    byte[] getFileById(Long characterId);
 
     void updateFile(MultipartFile file, Long characterId);
 
